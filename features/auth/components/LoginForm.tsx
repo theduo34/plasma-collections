@@ -47,7 +47,7 @@ export function LoginForm() {
 
   return (
     <form
-      className="flex w-full max-w-sm flex-col gap-6 rounded-lg border border-border bg-card p-8"
+      className="flex w-full max-w-sm flex-col gap-6 rounded-md border border-border bg-card p-8"
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >

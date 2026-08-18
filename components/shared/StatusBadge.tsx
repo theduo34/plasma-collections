@@ -4,7 +4,7 @@ export function StatusBadge({ label, className }: { label: string; className?: s
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border border-border bg-secondary px-2 py-0.5 text-xs text-secondary-foreground",
+        "inline-flex items-center rounded-md border border-border bg-secondary px-2 py-0.5 text-xs text-secondary-foreground",
         className
       )}
     >

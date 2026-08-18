@@ -8,7 +8,7 @@ export function WhatsAppOrderButton({ items }: { items: OrderItem[] }) {
 
   return (
     <button
-      className="flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-base font-medium text-primary-foreground"
+      className="flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-base font-medium text-primary-foreground"
       onClick={() => window.open(buildWhatsAppMessage(items, phoneNumber), "_blank")}
     >
       {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}

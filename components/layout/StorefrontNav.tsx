@@ -27,7 +27,7 @@ export function StorefrontNav() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
-              className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground transition-opacity hover:opacity-90"
             >
               {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
               <WhatsappLogoIcon className="text-whatsapp" size={22} weight="fill" />

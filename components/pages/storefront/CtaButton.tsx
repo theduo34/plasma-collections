@@ -25,7 +25,7 @@ export function CtaButton({
   children,
 }: CtaButtonProps) {
   const classes = cn(
-    "inline-flex items-center gap-2 px-6 py-3 text-sm font-medium tracking-wide uppercase transition-colors",
+    "inline-flex items-center gap-2 rounded-md px-6 py-3 text-sm font-medium tracking-wide uppercase transition-colors",
     VARIANT_CLASSES[variant],
     className
   )

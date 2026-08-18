@@ -5,7 +5,7 @@ import type { Item } from "@/features/catalogue/types/item"
 
 export function ItemCard({ item }: { item: Item }) {
   return (
-    <div className="group flex flex-col overflow-hidden border border-border bg-card transition-colors hover:border-primary">
+    <div className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary">
       <AspectRatio ratio={1} className="relative bg-muted">
         <div className="flex h-full w-full items-center justify-center">
           <ImageIcon className="text-muted-foreground/40" size={40} />
