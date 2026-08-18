@@ -301,9 +301,7 @@ the-drop/
 ├── lib/
 │   ├── utils.ts                          # cn() and shared utilities
 │   ├── permissions.ts                    # RBAC — roles, permissions, can()
-│   └── convex/
-│       ├── client.ts
-│       └── server.ts
+│   └── admin-login-path.ts               # resolves /<ADMIN_LOGIN_TOKEN>/login — server-only
 ├── types/
 └── proxy.ts                              # Next.js 16 — do not rename to middleware.ts
 ```
@@ -645,6 +643,10 @@ When in doubt, apply these in order:
 21. Third-party brand marks (WhatsApp's logo, any future payment/social logo) keep their own real color and full-size icon — never recolored to gold, never shrunk to a token "dot". Our own chrome (button surfaces, backgrounds) can still be gold; the mark itself can't.
 22. `components/pages/storefront/CtaButton.tsx` is not a duplicate of `components/ui/button.tsx` — it's the deliberately larger marketing CTA for storefront pages (hero, banners), where `components/ui/button.tsx` stays the compact control used in the admin console. Don't collapse them into one; don't hand-roll a third variant either — extend `CtaButton` if a new storefront CTA style is needed.
 23. Any list of ≥3 visually-identical items rendered from data (value props, category cards, nav links, etc.) is a typed, named, module-level array mapped over — never 3+ copy-pasted JSX blocks, never an anonymous array literal inline in the JSX. See `VALUE_PROPS` in `ValuePropsSection.tsx` for the pattern.
+24. Import `fetchQuery`/`fetchMutation`/`preloadQuery` directly from `convex/nextjs` at the call site. There is no `lib/convex/` wrapper — one existed, was never imported anywhere, and its `client.ts` half instantiated a second, unauthenticated `ConvexReactClient` completely separate from `providers/ConvexClientProvider.tsx`. Don't recreate it.
+25. Icons: never a hand-typed character standing in for one (no `→`, `✓`, emoji, etc. as a substitute icon) — every icon comes from `@phosphor-icons/react`. Generic icons (arrows, category glyphs, spinners) get no color override — they inherit the surrounding text color, i.e. no `className="text-primary"` decoration. Only a real third-party brand mark (WhatsApp) gets an explicit color, and only its own real brand color (`text-whatsapp`), never ours.
+26. Border radius is `rounded-md` everywhere a card, button, badge, or bordered panel needs rounding — this is a `rounded-none`-by-default (`radix-lyra`) shadcn style, so every `components/ui/*.tsx` file and every hand-written bordered surface has been overridden to `rounded-md` for one consistent radius language project-wide. The one deliberate exception is a circular avatar (`components/shared/Avatar.tsx`) — a profile picture is conventionally a circle, not a rounded square.
+27. When a role is a strict superset of another (super-admin ⊇ admin in `lib/permissions.ts`), express it structurally — spread the smaller role's permission list into the bigger one's — never re-list the same permissions by hand in both places.
 
 <!-- convex-ai-start -->
 
