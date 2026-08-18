@@ -231,7 +231,13 @@ the-drop/
 │   │   └── FileUpload.tsx
 │   ├── pages/
 │   │   ├── storefront/
-│   │   │   ├── StorefrontHomePage.tsx
+│   │   │   ├── StorefrontHomePage.tsx    # thin composition — fetches, then assembles the sections below
+│   │   │   ├── HeroSection.tsx
+│   │   │   ├── ValuePropsSection.tsx
+│   │   │   ├── CategoryHighlights.tsx
+│   │   │   ├── FeaturedSection.tsx
+│   │   │   ├── CtaSection.tsx
+│   │   │   ├── CtaButton.tsx             # storefront marketing CTA — not components/ui/button.tsx, see below
 │   │   │   ├── CataloguePage.tsx
 │   │   │   └── ItemDetailPage.tsx
 │   │   ├── dashboard/
@@ -637,6 +643,8 @@ When in doubt, apply these in order:
 19. The login page is never at literal `/login`. It's at `/<ADMIN_LOGIN_TOKEN>/login` (see `lib/admin-login-path.ts`), and unauthenticated redirects from protected routes go to `/`, never to the login path — never hardcode `/login` or redirect to the login path from a public-facing check.
 20. Repeated page-layout spacing goes in `app/globals.css` as an `@utility` (`container-page`, `section-y`), not copy-pasted `mx-auto max-w-* px-* py-*` per file.
 21. Third-party brand marks (WhatsApp's logo, any future payment/social logo) keep their own real color and full-size icon — never recolored to gold, never shrunk to a token "dot". Our own chrome (button surfaces, backgrounds) can still be gold; the mark itself can't.
+22. `components/pages/storefront/CtaButton.tsx` is not a duplicate of `components/ui/button.tsx` — it's the deliberately larger marketing CTA for storefront pages (hero, banners), where `components/ui/button.tsx` stays the compact control used in the admin console. Don't collapse them into one; don't hand-roll a third variant either — extend `CtaButton` if a new storefront CTA style is needed.
+23. Any list of ≥3 visually-identical items rendered from data (value props, category cards, nav links, etc.) is a typed, named, module-level array mapped over — never 3+ copy-pasted JSX blocks, never an anonymous array literal inline in the JSX. See `VALUE_PROPS` in `ValuePropsSection.tsx` for the pattern.
 
 <!-- convex-ai-start -->
 
