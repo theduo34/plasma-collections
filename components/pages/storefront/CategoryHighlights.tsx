@@ -1,11 +1,12 @@
 import Link from "next/link"
-import type { Category } from "@/features/catalogue/types/item"
+import Image from "next/image"
+import type { PublicCategory } from "@/features/catalogue/types/item"
 
 // Edge-to-edge photo-block treatment — no gaps, no borders, category name
-// overlaid directly on the (placeholder, for now) image. bg-foreground /
-// text-background stand in for a real product photo: swapping the theme's
-// two neutrals gives a dark placeholder block without inventing a new color.
-export function CategoryHighlights({ categories }: { categories: Category[] }) {
+// overlaid directly on the image. Without a real photo yet, bg-foreground /
+// text-background stand in for one: swapping the theme's two neutrals gives
+// a dark placeholder block without inventing a new color.
+export function CategoryHighlights({ categories }: { categories: PublicCategory[] }) {
   if (categories.length === 0) return null
 
   return (
@@ -14,9 +15,22 @@ export function CategoryHighlights({ categories }: { categories: Category[] }) {
         <Link
           key={category._id}
           href={`/catalogue?category=${category.slug}`}
-          className="group relative flex flex-1 items-end bg-foreground p-8 transition-opacity hover:opacity-90"
+          className="group relative flex flex-1 items-end overflow-hidden bg-foreground p-8"
         >
-          <div>
+          {category.imageUrl && (
+            <>
+              <Image
+                src={category.imageUrl}
+                alt=""
+                fill
+                sizes="33vw"
+                className="object-cover transition-opacity group-hover:opacity-90"
+              />
+              {/* Scrim for label legibility over a real photo. */}
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/10 to-transparent" />
+            </>
+          )}
+          <div className="relative">
             <span className="font-sans text-2xl font-semibold tracking-wide text-background uppercase">
               {category.name}
             </span>

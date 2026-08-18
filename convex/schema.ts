@@ -19,6 +19,7 @@ export default defineSchema({
     name: v.string(),                          // e.g. "Clothes", "Shoes", "Repairs"
     slug: v.string(),                          // e.g. "clothes", "shoes", "repairs"
     order: v.number(),                         // display order
+    imageStorageId: v.optional(v.id("_storage")),
   }).index("by_slug", ["slug"]),
 
   items: defineTable({

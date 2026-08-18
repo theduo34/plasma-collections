@@ -204,8 +204,11 @@ the-drop/
 │   ├── users.ts                          # createAdmin, createSuperAdmin, listUsers, deactivate
 │   ├── items.ts                          # CRUD for catalogue items
 │   ├── categories.ts                     # Category management
+│   ├── seed.ts                           # Dev-only fixture data — refuses to run on a non-empty catalogue
+│   ├── seedImages.ts                     # Dev-only placeholder photos via ctx.storage — see below
 │   ├── public/
-│   │   └── items.ts                      # Public-readable queries — no requireRole()
+│   │   ├── items.ts                      # Public-readable queries — no requireRole()
+│   │   └── categories.ts                 # Public-readable queries — no requireRole()
 │   ├── lib/
 │   │   └── auth.ts                       # requireRole(ctx, roles) — Convex-side RBAC gate
 │   └── _generated/                       # Auto-generated — never edit
@@ -334,6 +337,7 @@ export default defineSchema({
     name: v.string(),                          // e.g. "Clothes", "Shoes", "Repairs"
     slug: v.string(),                          // e.g. "clothes", "shoes", "repairs"
     order: v.number(),                         // display order
+    imageStorageId: v.optional(v.id("_storage")),
   }).index("by_slug", ["slug"]),
 
   items: defineTable({
@@ -351,7 +355,10 @@ export default defineSchema({
   })
     .index("by_category", ["categoryId"])
     .index("by_visible", ["isVisible"])
-    .index("by_stock", ["inStock"]),
+    .index("by_stock", ["inStock"])
+    // Storefront category pages filter by both fields — a compound index
+    // avoids reading every item in a category just to discard hidden ones.
+    .index("by_category_and_visibility", ["categoryId", "isVisible"]),
 
   auditLog: defineTable({
     action: v.string(),                        // e.g. "item.create", "item.delete", "user.deactivate"
@@ -651,6 +658,7 @@ When in doubt, apply these in order:
 27. When a role is a strict superset of another (super-admin ⊇ admin in `lib/permissions.ts`), express it structurally — spread the smaller role's permission list into the bigger one's — never re-list the same permissions by hand in both places.
 28. To flip a section to the black/gold "dark luxury" palette (the homepage hero, the closing CTA+footer), add `className="dark"` to that section and keep using the normal semantic tokens (`bg-background`, `text-foreground`, `text-muted-foreground`) inside it — the `.dark` CSS scope remaps those tokens to `--pc-black`/`--pc-white`/etc. automatically. Never hardcode a dark-section color directly; if a section needs to look dark, scope it, don't recolor it.
 29. The homepage structure (Option B, approved over an "editorial split" alternative) is: full-bleed dark `HeroSection` (`-mt-16` under the nav) → `StatementSection` (one big line, no card, no icons) → `CategoryHighlights` (edge-to-edge, no gaps, no borders, name overlaid on the block) → `FeaturedSection` (borderless product tiles) → `CtaSection` + `StorefrontFooter` (share the same `dark` scope, no seam between them, deliberately one continuous closing block). Don't reintroduce bordered/boxed sections or reflow this into a symmetric "stack of equal cards" — that's the pattern this replaced.
+30. Item/category photos go through `ctx.storage` exactly the same way whether they're a real admin upload or a dev placeholder — `convex/seedImages.ts` fills in anything missing an `imageStorageId` via a placeholder image service and `ctx.storage.store()`, the real storage pipeline, not a throwaway hack. Public queries resolve `imageStorageId` to a servable URL themselves (see `PublicItem`/`PublicCategory` in `features/catalogue/types/item.ts`) — components never call `ctx.storage.getUrl` or construct a storage URL themselves. Once every item/category has a real uploaded photo, `seedPlaceholderImages` simply finds nothing left to do — no cleanup step needed.
 
 <!-- convex-ai-start -->
 
