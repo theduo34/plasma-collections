@@ -27,9 +27,9 @@ export function CategoryHighlights({ categories }: { categories: Category[] }) {
               <Link
                 key={category._id}
                 href={`/catalogue?category=${category.slug}`}
-                className="flex flex-col items-center gap-3 border border-border px-6 py-8 text-center transition-colors hover:border-primary"
+                className="flex flex-col items-center gap-3 rounded-md border border-border px-6 py-8 text-center transition-colors hover:border-primary"
               >
-                <CategoryIcon className="text-primary" size={32} />
+                <CategoryIcon size={32} />
                 <span className="text-sm font-medium tracking-widest text-foreground uppercase">
                   {category.name}
                 </span>
