@@ -7,19 +7,16 @@ export async function StorefrontFooter() {
   const phoneNumber = process.env.NEXT_PUBLIC_WA_NUMBER
 
   return (
-    <footer className="border-t border-border">
-      <div className="container-page grid gap-8 py-10 sm:grid-cols-3">
-        <div className="flex flex-col gap-2">
-          <span className="font-sans text-base font-semibold uppercase tracking-[0.2em] text-foreground">
+    <footer className="border-t border-border bg-secondary">
+      <div className="container-page grid gap-10 py-16 sm:grid-cols-3">
+        <div className="flex flex-col gap-3">
+          <span className="font-sans text-lg font-semibold uppercase tracking-[0.2em] text-foreground">
             Plasma Collections
           </span>
-          <p className="text-sm text-muted-foreground">
-            Premium Ghanaian fashion — clothes, shoes, and repairs. Orders taken directly on
-            WhatsApp.
-          </p>
+          <p className="text-sm text-muted-foreground">Ghanaian fashion, ordered on WhatsApp.</p>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <span className="text-sm font-medium uppercase tracking-widest text-foreground">
             Shop
           </span>
@@ -37,7 +34,7 @@ export async function StorefrontFooter() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <span className="text-sm font-medium uppercase tracking-widest text-foreground">
             Contact
           </span>

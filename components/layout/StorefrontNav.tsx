@@ -1,11 +1,32 @@
+'use client'
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { WhatsappLogoIcon } from "@phosphor-icons/react/dist/ssr"
+import { WhatsappLogoIcon } from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
 
 export function StorefrontNav() {
   const phoneNumber = process.env.NEXT_PUBLIC_WA_NUMBER
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8)
+    }
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
+    <header
+      className={cn(
+        "sticky top-0 z-10 border-b transition-all duration-300",
+        scrolled
+          ? "border-border bg-background/85 shadow-sm backdrop-blur"
+          : "border-transparent bg-background"
+      )}
+    >
       <nav className="container-page flex h-16 items-center justify-between">
         <Link
           href="/"

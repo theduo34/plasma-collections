@@ -15,24 +15,24 @@ const VALUE_PROPS: ValueProp[] = [
   {
     icon: SparkleIcon,
     title: "Handpicked Quality",
-    description: "Every piece is selected for craftsmanship, not volume.",
+    description: "Selected for craftsmanship, not volume.",
   },
   {
     icon: WhatsappLogoIcon,
     iconClassName: "text-whatsapp",
     title: "Order on WhatsApp",
-    description: "No cart, no account — just message us to buy.",
+    description: "No cart, no account — just message us.",
   },
   {
     icon: ScissorsIcon,
     title: "Repairs & Alterations",
-    description: "Resoling, hemming, and leather restoration, done right.",
+    description: "Resoling, hemming, and leather restoration.",
   },
 ]
 
 export function ValuePropsSection() {
   return (
-    <section className="border-t border-border">
+    <section>
       <div className="container-page section-y grid gap-8 sm:grid-cols-3">
         {VALUE_PROPS.map(({ icon: ValuePropIcon, iconClassName, title, description }) => (
           <div key={title} className="flex flex-col items-center gap-2 text-center">

@@ -15,7 +15,7 @@ export function CategoryHighlights({ categories }: { categories: Category[] }) {
   if (categories.length === 0) return null
 
   return (
-    <section className="border-t border-border">
+    <section className="bg-secondary/40">
       <div className="container-page section-y">
         <h2 className="mb-6 text-sm font-medium tracking-widest text-foreground uppercase">
           Shop by Category
@@ -27,7 +27,7 @@ export function CategoryHighlights({ categories }: { categories: Category[] }) {
               <Link
                 key={category._id}
                 href={`/catalogue?category=${category.slug}`}
-                className="flex flex-col items-center gap-3 rounded-md border border-border px-6 py-8 text-center transition-colors hover:border-primary"
+                className="flex flex-col items-center gap-3 rounded-md border border-border bg-background px-6 py-8 text-center transition-colors hover:border-primary"
               >
                 <CategoryIcon size={32} />
                 <span className="text-sm font-medium tracking-widest text-foreground uppercase">
