@@ -133,10 +133,10 @@ Three surfaces. No profiles table with a self-serve role — Convex Auth's users
 - **Bootstrapping the first super-admin** is a one-time, out-of-band step:
 
 ```bash
-bunx convex run users:createSuperAdmin '{"email":"you@email.com","password":"..."}'
+bunx convex run users:createSuperAdmin '{"email":"you@email.com","name":"Your Name","password":"..."}'
 ```
 
-`users:createSuperAdmin` must be an `internalMutation` — not reachable from client code at all — and must refuse to run a second time once any super-admin already exists.
+`users:createSuperAdmin` must be an `internalAction` — not reachable from client code at all — and must refuse to run a second time once any super-admin already exists. It's an action, not a mutation: `createAccount()` from `@convex-dev/auth/server` needs an action ctx to hash the password and write the `users`/`authAccounts` rows.
 
 ### Why public has no account
 
