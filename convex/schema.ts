@@ -36,7 +36,10 @@ export default defineSchema({
   })
     .index("by_category", ["categoryId"])
     .index("by_visible", ["isVisible"])
-    .index("by_stock", ["inStock"]),
+    .index("by_stock", ["inStock"])
+    // Storefront category pages filter by both fields — a compound index
+    // avoids reading every item in a category just to discard hidden ones.
+    .index("by_category_and_visibility", ["categoryId", "isVisible"]),
 
   auditLog: defineTable({
     action: v.string(),                        // e.g. "item.create", "item.delete", "user.deactivate"

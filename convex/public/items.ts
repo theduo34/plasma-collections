@@ -33,8 +33,9 @@ export const listByCategory = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("items")
-      .withIndex("by_category", (q) => q.eq("categoryId", args.categoryId))
-      .filter((q) => q.eq(q.field("isVisible"), true))
+      .withIndex("by_category_and_visibility", (q) =>
+        q.eq("categoryId", args.categoryId).eq("isVisible", true)
+      )
       .order("desc")
       .collect()
   },
