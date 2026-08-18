@@ -270,12 +270,14 @@ the-drop/
 │   │   │   ├── ItemCard.tsx              # Product card used on storefront
 │   │   │   ├── ItemGrid.tsx              # Grid layout for ItemCard list
 │   │   │   ├── CategoryFilter.tsx        # Filter tabs: All / Clothes / Shoes / Repairs
+│   │   │   ├── CatalogueBrowser.tsx      # /catalogue page body — filter state lives in the URL (?category=slug)
 │   │   │   ├── WhatsAppOrderButton.tsx   # The core CTA — opens pre-filled WA message
 │   │   │   ├── ItemForm.tsx              # Add/edit item form (admin)
 │   │   │   └── AdminItemTable.tsx        # Table view for admin catalogue management
 │   │   ├── hooks/
 │   │   │   ├── useItems.ts
 │   │   │   ├── usePublicItems.ts
+│   │   │   ├── usePublicCategories.ts
 │   │   │   └── useItemMutations.ts
 │   │   └── types/
 │   │       └── item.ts

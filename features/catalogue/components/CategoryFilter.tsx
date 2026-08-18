@@ -29,7 +29,7 @@ export function CategoryFilter({
           aria-pressed={selected === entry.id}
           onClick={() => onSelect(entry.id)}
           className={cn(
-            "rounded-md border px-3 py-1 text-xs uppercase tracking-wide transition-colors",
+            "rounded-md border px-4 py-1.5 text-sm uppercase tracking-wide transition-colors",
             selected === entry.id
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border text-foreground hover:border-primary"
