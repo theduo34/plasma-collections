@@ -6,7 +6,11 @@ import { query } from "../_generated/server"
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    throw new Error("Not implemented")
+    return await ctx.db
+      .query("items")
+      .withIndex("by_visible", (q) => q.eq("isVisible", true))
+      .order("desc")
+      .collect()
   },
 })
 
@@ -16,7 +20,9 @@ export const get = query({
     itemId: v.id("items"),
   },
   handler: async (ctx, args) => {
-    throw new Error("Not implemented")
+    const item = await ctx.db.get(args.itemId)
+    if (item === null || !item.isVisible) return null
+    return item
   },
 })
 
@@ -25,6 +31,11 @@ export const listByCategory = query({
     categoryId: v.id("categories"),
   },
   handler: async (ctx, args) => {
-    throw new Error("Not implemented")
+    return await ctx.db
+      .query("items")
+      .withIndex("by_category", (q) => q.eq("categoryId", args.categoryId))
+      .filter((q) => q.eq(q.field("isVisible"), true))
+      .order("desc")
+      .collect()
   },
 })

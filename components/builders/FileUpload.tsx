@@ -1,4 +1,4 @@
-import { ImageIcon } from "@phosphor-icons/react"
+import { ImageIcon } from "@phosphor-icons/react/dist/ssr"
 
 // TODO: wire to ctx.storage.generateUploadUrl
 export function FileUpload({ label }: { label: string }) {

@@ -111,7 +111,13 @@ The app supports real light and dark themes (`:root` = light default, `.dark` = 
 
 Use `@phosphor-icons/react` exclusively. Never use `lucide-react` or any other icon library. Icon names end in `Icon`: `ShoppingBagIcon`, `WhatsappLogoIcon`, `PencilSimpleIcon`, `TrashIcon`, `ImageIcon`.
 
+The default entrypoint's icons use React Context internally and crash with `createContext only works in Client Components` if rendered from a file without `'use client'`. Import from `@phosphor-icons/react/dist/ssr` in any Server Component; only use the default `@phosphor-icons/react` entrypoint inside files that already have `'use client'` at the top.
+
 ```tsx
+// Server Component (no 'use client')
+import { ShoppingBagIcon, WhatsappLogoIcon } from '@phosphor-icons/react/dist/ssr'
+
+// Client Component ('use client' at top of file)
 import { ShoppingBagIcon, WhatsappLogoIcon } from '@phosphor-icons/react'
 ```
 
@@ -617,7 +623,7 @@ When in doubt, apply these in order:
 7. `convex/_generated/` → auto-generated. Never edit manually.
 8. `lib/permissions.ts` → only place permissions are defined. Never hardcode role strings elsewhere.
 9. No raw color classes. Only semantic tokens (`text-primary`, `text-destructive`, etc.).
-10. No `lucide-react`. Only `@phosphor-icons/react`.
+10. No `lucide-react`. Only `@phosphor-icons/react` — from `/dist/ssr` in Server Components, the default entrypoint only inside `'use client'` files.
 11. No Row Level Security exists. `requireRole()` in every Convex function is the actual security layer.
 12. `requireRole()` first in every Convex query/mutation that touches non-public data.
 13. Public storefront queries live in `convex/public/` — the missing `requireRole()` there is intentional and obvious.
