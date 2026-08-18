@@ -8,11 +8,11 @@ export function WhatsAppOrderButton({ items }: { items: OrderItem[] }) {
 
   return (
     <button
-      className="flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
+      className="flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-base font-medium text-primary-foreground"
       onClick={() => window.open(buildWhatsAppMessage(items, phoneNumber), "_blank")}
     >
-      {/* Only intentional exception to "semantic tokens only" */}
-      <WhatsappLogoIcon className="text-[#25D366]" size={18} />
+      {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
+      <WhatsappLogoIcon className="text-whatsapp" size={20} weight="fill" />
       Order on WhatsApp
     </button>
   )

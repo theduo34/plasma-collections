@@ -31,6 +31,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-whatsapp: var(--whatsapp);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -62,6 +63,7 @@
   --pc-border: #1F1F1F;
   --pc-white: #F5F5F0;
   --pc-destructive: #DC4444; /* not in the brand palette — standard error red */
+  --whatsapp: #25D366; /* WhatsApp's own brand green — third-party mark, never recolored to gold */
 
   /* Light theme (default) — a light neutral base, not black. */
   --background: oklch(1 0 0);
@@ -150,6 +152,16 @@
   --sidebar-accent-foreground: var(--pc-white);
   --sidebar-border: var(--pc-border);
   --sidebar-ring: var(--pc-gold);
+}
+
+/* Reusable layout utilities — define spacing once here, use as a
+   className everywhere instead of repeating mx-auto/max-w/px/py per page. */
+@utility container-page {
+  @apply mx-auto w-full max-w-6xl px-6;
+}
+
+@utility section-y {
+  @apply py-10;
 }
 
 @layer base {

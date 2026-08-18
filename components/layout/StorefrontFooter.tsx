@@ -8,29 +8,29 @@ export async function StorefrontFooter() {
 
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-3">
+      <div className="container-page grid gap-8 py-10 sm:grid-cols-3">
         <div className="flex flex-col gap-2">
-          <span className="font-sans text-sm font-semibold uppercase tracking-[0.2em] text-foreground">
+          <span className="font-sans text-base font-semibold uppercase tracking-[0.2em] text-foreground">
             Plasma Collections
           </span>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Premium Ghanaian fashion — clothes, shoes, and repairs. Orders taken directly on
             WhatsApp.
           </p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium uppercase tracking-widest text-foreground">
+          <span className="text-sm font-medium uppercase tracking-widest text-foreground">
             Shop
           </span>
-          <Link href="/catalogue" className="text-xs text-muted-foreground hover:text-foreground">
+          <Link href="/catalogue" className="text-sm text-muted-foreground hover:text-foreground">
             Full catalogue
           </Link>
           {categories.map((category) => (
             <Link
               key={category._id}
               href={`/catalogue?category=${category.slug}`}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-sm text-muted-foreground hover:text-foreground"
             >
               {category.name}
             </Link>
@@ -38,7 +38,7 @@ export async function StorefrontFooter() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="text-xs font-medium uppercase tracking-widest text-foreground">
+          <span className="text-sm font-medium uppercase tracking-widest text-foreground">
             Contact
           </span>
           {phoneNumber && (
@@ -46,17 +46,19 @@ export async function StorefrontFooter() {
               href={`https://wa.me/${phoneNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-sm text-muted-foreground hover:text-foreground"
             >
               Chat on WhatsApp
             </a>
           )}
-          <span className="text-xs text-muted-foreground">Accra, Ghana</span>
+          <span className="text-sm text-muted-foreground">Accra, Ghana</span>
         </div>
       </div>
 
-      <div className="border-t border-border px-6 py-4 text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Plasma Collections
+      <div className="border-t border-border">
+        <div className="container-page py-4 text-sm text-muted-foreground">
+          © {new Date().getFullYear()} Plasma Collections
+        </div>
       </div>
     </footer>
   )

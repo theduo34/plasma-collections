@@ -6,10 +6,10 @@ export function StorefrontNav() {
 
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+      <nav className="container-page flex h-16 items-center justify-between">
         <Link
           href="/"
-          className="font-sans text-sm font-semibold uppercase tracking-[0.2em] text-foreground"
+          className="font-sans text-base font-semibold uppercase tracking-[0.2em] text-foreground"
         >
           Plasma Collections
         </Link>
@@ -17,7 +17,7 @@ export function StorefrontNav() {
         <div className="flex items-center gap-6">
           <Link
             href="/catalogue"
-            className="text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+            className="text-sm uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
           >
             Catalogue
           </Link>
@@ -27,10 +27,10 @@ export function StorefrontNav() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
-              className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
             >
-              {/* Only intentional exception to "semantic tokens only" */}
-              <WhatsappLogoIcon className="text-[#25D366]" size={18} weight="fill" />
+              {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
+              <WhatsappLogoIcon className="text-whatsapp" size={22} weight="fill" />
             </a>
           )}
         </div>

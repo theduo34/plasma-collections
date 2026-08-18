@@ -70,6 +70,7 @@ The app supports real light and dark themes (`:root` = light default, `.dark` = 
 --pc-surface: #111111;       /* card / panel background */
 --pc-border: #1F1F1F;        /* subtle borders */
 --pc-white: #F5F5F0;         /* body text on dark backgrounds */
+--whatsapp: #25D366;         /* WhatsApp's own brand green — third-party mark, never recolored to gold */
 ```
 
 **Typography:**
@@ -77,7 +78,7 @@ The app supports real light and dark themes (`:root` = light default, `.dark` = 
 - Body: Geist Mono (brand's monospace-first feel)
 - Price / data: JetBrains Mono
 
-**Signature element:** The WhatsApp order button is rendered in gold, not WhatsApp green — it matches the brand. Green only appears as a subtle indicator dot on the icon itself.
+**Signature element:** The WhatsApp order button surface is gold, not WhatsApp green — that's our own chrome, matches the brand. The WhatsApp logo icon itself is a third-party mark: never recolor it gold, always render it in WhatsApp's own green via the `--whatsapp` token (`text-whatsapp`), same as their real icon.
 
 **Tailwind v4 rules apply in full** — no `tailwind.config.js`, semantic color tokens only, `gap-*` not `space-*`, `size-*` for square elements, no manual `dark:` overrides.
 
@@ -90,6 +91,7 @@ The app supports real light and dark themes (`:root` = light default, `.dark` = 
 - Use `gap-*` for spacing between flex/grid children. Never `space-x-*` or `space-y-*`.
 - Use `size-*` when width and height are equal (`size-10` not `w-10 h-10`).
 - No manual `dark:` color overrides — semantic tokens handle this automatically.
+- Repeated layout spacing (page container width/padding, section vertical rhythm) is defined once in `app/globals.css` via `@utility` and used as a className — `container-page` (max-width + horizontal padding) and `section-y` (vertical section padding). Add new shared spacing patterns the same way instead of repeating raw `mx-auto max-w-* px-* py-*` across files.
 
 ---
 
@@ -622,7 +624,7 @@ When in doubt, apply these in order:
 6. `components/ui/` → shadcn only, never edit manually. Use `bun shadcn:add`.
 7. `convex/_generated/` → auto-generated. Never edit manually.
 8. `lib/permissions.ts` → only place permissions are defined. Never hardcode role strings elsewhere.
-9. No raw color classes. Only semantic tokens (`text-primary`, `text-destructive`, etc.).
+9. No raw color classes, ever — not even for one-off brand marks like WhatsApp. Every color used in a className must be a token defined in `app/globals.css` (`text-primary`, `text-destructive`, `text-whatsapp`, etc.). If a new color is genuinely needed, add it as a token there first, then reference it — never `text-[#hex]`.
 10. No `lucide-react`. Only `@phosphor-icons/react` — from `/dist/ssr` in Server Components, the default entrypoint only inside `'use client'` files.
 11. No Row Level Security exists. `requireRole()` in every Convex function is the actual security layer.
 12. `requireRole()` first in every Convex query/mutation that touches non-public data.
@@ -633,6 +635,8 @@ When in doubt, apply these in order:
 17. Keep components under ~150 lines. Split if larger.
 18. `proxy.ts` at project root — do not rename or move, and do not call it `middleware.ts`.
 19. The login page is never at literal `/login`. It's at `/<ADMIN_LOGIN_TOKEN>/login` (see `lib/admin-login-path.ts`), and unauthenticated redirects from protected routes go to `/`, never to the login path — never hardcode `/login` or redirect to the login path from a public-facing check.
+20. Repeated page-layout spacing goes in `app/globals.css` as an `@utility` (`container-page`, `section-y`), not copy-pasted `mx-auto max-w-* px-* py-*` per file.
+21. Third-party brand marks (WhatsApp's logo, any future payment/social logo) keep their own real color and full-size icon — never recolored to gold, never shrunk to a token "dot". Our own chrome (button surfaces, backgrounds) can still be gold; the mark itself can't.
 
 <!-- convex-ai-start -->
 

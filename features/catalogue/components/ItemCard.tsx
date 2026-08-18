@@ -8,7 +8,7 @@ export function ItemCard({ item }: { item: Item }) {
     <div className="group flex flex-col overflow-hidden border border-border bg-card transition-colors hover:border-primary">
       <AspectRatio ratio={1} className="relative bg-muted">
         <div className="flex h-full w-full items-center justify-center">
-          <ImageIcon className="text-muted-foreground/40" size={32} />
+          <ImageIcon className="text-muted-foreground/40" size={40} />
         </div>
         {!item.inStock && (
           <Badge variant="secondary" className="absolute top-2 left-2">
@@ -17,8 +17,8 @@ export function ItemCard({ item }: { item: Item }) {
         )}
       </AspectRatio>
       <div className="flex flex-1 flex-col gap-1 p-4">
-        <p className="text-sm text-foreground">{item.name}</p>
-        <p className="font-price text-sm text-primary">GH₵ {(item.price / 100).toFixed(2)}</p>
+        <p className="text-base text-foreground">{item.name}</p>
+        <p className="font-price text-base text-primary">GH₵ {(item.price / 100).toFixed(2)}</p>
       </div>
     </div>
   )
