@@ -61,12 +61,14 @@ Plasma Collections' visual identity is **black and gold** — dark luxury, not s
 
 The app supports real light and dark themes (`:root` = light default, `.dark` = dark, standard shadcn convention) — it does not force dark globally. The gold accent (`--pc-gold`) stays constant as `--primary`/`--ring` in both; only the neutrals (background/foreground/card/border) swap. Light mode must never render a black background — that was a bug in an earlier version of this file where `:root` duplicated the dark values.
 
+**Gold is for emphasis, not decoration.** `--primary` (and `text-primary`/`bg-primary`) is reserved for the one or two things per screen that genuinely need attention — the main call-to-action button, a focus ring, an active/selected state. It is not a default text color, not an icon color, not something applied because a piece of text is "on brand." Most of the page is neutral (`--foreground`, `--muted-foreground`) so that gold actually stands out when it appears. `--muted-foreground` is a true neutral gray, not a gold tint — an earlier version of this file wired it to `--pc-gold-muted`, which colored nearly every description, caption, and secondary link on the site gold; that was a bug, not a design choice.
+
 ```css
 /* app/globals.css — seed these under @theme inline { ... } */
 --pc-black: #0A0A0A;         /* dark-mode background */
 --pc-gold: #C9A227;          /* primary accent — buttons, highlights, borders */
 --pc-gold-light: #E8C84A;    /* hover states */
---pc-gold-muted: #8B6F1E;    /* muted gold for secondary text */
+--pc-gold-muted: #8B6F1E;    /* reserved for a deliberate sparing gold accent — NOT muted-foreground */
 --pc-surface: #111111;       /* card / panel background */
 --pc-border: #1F1F1F;        /* subtle borders */
 --pc-white: #F5F5F0;         /* body text on dark backgrounds */

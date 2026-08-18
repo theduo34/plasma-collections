@@ -18,7 +18,9 @@ export function ItemCard({ item }: { item: Item }) {
       </AspectRatio>
       <div className="flex flex-1 flex-col gap-1 p-4">
         <p className="text-base text-foreground">{item.name}</p>
-        <p className="font-price text-base text-primary">GH₵ {(item.price / 100).toFixed(2)}</p>
+        <p className="font-price text-base font-medium text-foreground">
+          GH₵ {(item.price / 100).toFixed(2)}
+        </p>
       </div>
     </div>
   )

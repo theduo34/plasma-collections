@@ -58,7 +58,7 @@
   --pc-black: #0A0A0A;
   --pc-gold: #C9A227;
   --pc-gold-light: #E8C84A;
-  --pc-gold-muted: #8B6F1E;
+  --pc-gold-muted: #8B6F1E; /* reserved — not muted-foreground, that's a neutral gray; use only for a deliberate sparing gold accent */
   --pc-surface: #111111;
   --pc-border: #1F1F1F;
   --pc-white: #F5F5F0;
@@ -79,7 +79,7 @@
   --secondary-foreground: var(--pc-black);
 
   --muted: oklch(0.97 0 0);
-  --muted-foreground: var(--pc-gold-muted);
+  --muted-foreground: oklch(0.556 0 0);
   --accent: var(--pc-gold-light);
   --accent-foreground: var(--pc-black);
 
@@ -125,7 +125,7 @@
   --secondary-foreground: var(--pc-white);
 
   --muted: var(--pc-surface);
-  --muted-foreground: var(--pc-gold-muted);
+  --muted-foreground: oklch(0.708 0 0);
   --accent: var(--pc-gold-light);
   --accent-foreground: var(--pc-black);
 
@@ -161,7 +161,7 @@
 }
 
 @utility section-y {
-  @apply py-10;
+  @apply py-14;
 }
 
 @layer base {
