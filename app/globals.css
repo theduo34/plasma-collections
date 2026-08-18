@@ -53,8 +53,7 @@
 }
 
 :root {
-  /* Brand palette — gold accent stays constant across both themes; only the
-     neutrals (background/foreground/card/border) change between light and dark. */
+
   --pc-black: #0A0A0A;
   --pc-gold: #C9A227;
   --pc-gold-light: #E8C84A;
@@ -150,41 +149,6 @@
   --sidebar-accent: var(--pc-border);
   --sidebar-accent-foreground: var(--pc-white);
   --sidebar-border: var(--pc-border);
-  --sidebar-ring: var(--pc-gold);
-}
-
-/* Force light-mode tokens on a specific subtree regardless of <html class="dark">.
-   Apply this class to a page wrapper to pin it to light mode. */
-.force-light {
-  color-scheme: light;
-  --background: oklch(1 0 0);
-  --foreground: var(--pc-black);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--pc-black);
-  --popover: oklch(1 0 0);
-  --popover-foreground: var(--pc-black);
-  --primary: var(--pc-gold);
-  --primary-foreground: var(--pc-black);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: var(--pc-black);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: var(--pc-gold-muted);
-  --accent: var(--pc-gold-light);
-  --accent-foreground: var(--pc-black);
-  --destructive: var(--pc-destructive);
-  --destructive-foreground: oklch(1 0 0);
-  --warning: oklch(0.86 0.15 82);
-  --warning-foreground: oklch(0.28 0.07 65);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: var(--pc-gold);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: var(--pc-black);
-  --sidebar-primary: var(--pc-gold);
-  --sidebar-primary-foreground: var(--pc-black);
-  --sidebar-accent: oklch(0.91 0 0);
-  --sidebar-accent-foreground: var(--pc-black);
-  --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: var(--pc-gold);
 }
 
