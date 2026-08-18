@@ -30,12 +30,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <ConvexAuthNextjsServerProvider>
       <html
         lang="en"
-        className={`dark ${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
           <ConvexClientProvider>
             {children}
-            <Toaster theme="dark" />
+            <Toaster theme="light" />
           </ConvexClientProvider>
         </body>
       </html>
