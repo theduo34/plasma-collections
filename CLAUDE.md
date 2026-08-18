@@ -158,8 +158,9 @@ the-drop/
 │   │           └── page.tsx              # Item detail page
 │   │
 │   ├── (auth)/                           # Login only — no register
-│   │   └── login/
-│   │       └── page.tsx
+│   │   └── [adminToken]/                 # Secret segment, checked against ADMIN_LOGIN_TOKEN
+│   │       └── login/
+│   │           └── page.tsx              # 404s unless adminToken matches env
 │   │
 │   ├── (admin)/                          # Authenticated — shared sidebar layout
 │   │   ├── layout.tsx                    # Auth guard + role check + sidebar + topbar
@@ -491,6 +492,8 @@ export function ConvexClientProvider({ children }: { children: React.ReactNode }
 
 Next.js 16 renamed `middleware.ts` to `proxy.ts`. Do not rename it back.
 
+The login page is not at `/login`. It lives at `/<ADMIN_LOGIN_TOKEN>/login`, a path built from a UUID set in `.env.local` (see `lib/admin-login-path.ts`). Unauthenticated visitors to protected routes are redirected to `/`, never to the login path itself — a redirect to it would advertise the secret URL to anyone who tries `/dashboard`.
+
 ```ts
 // proxy.ts
 import {
@@ -499,15 +502,16 @@ import {
   isAuthenticatedNextjs,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server"
+import { getAdminLoginPath } from "@/lib/admin-login-path"
 
 const isAdminRoute = createRouteMatcher(["/dashboard", "/admin(.*)"])
-const isLoginRoute = createRouteMatcher(["/login"])
+const isLoginRoute = createRouteMatcher([getAdminLoginPath()])
 
-export default convexAuthNextjsMiddleware((request) => {
-  if (isAdminRoute(request) && !isAuthenticatedNextjs()) {
-    return nextjsMiddlewareRedirect(request, "/login")
+export default convexAuthNextjsMiddleware(async (request) => {
+  if (isAdminRoute(request) && !(await isAuthenticatedNextjs())) {
+    return nextjsMiddlewareRedirect(request, "/")
   }
-  if (isLoginRoute(request) && isAuthenticatedNextjs()) {
+  if (isLoginRoute(request) && (await isAuthenticatedNextjs())) {
     return nextjsMiddlewareRedirect(request, "/dashboard")
   }
 })
@@ -556,6 +560,7 @@ app/(public|auth|admin)/[route]/page.tsx  ← metadata only, imports the page co
 NEXT_PUBLIC_CONVEX_URL=           # from `bunx convex dev`
 CONVEX_DEPLOYMENT=                # dev:xxx or prod:xxx — set automatically by the CLI
 AUTH_SECRET=                      # Convex Auth session signing secret — server-only
+ADMIN_LOGIN_TOKEN=                # UUID; login page lives at /<this>/login — server-only, never NEXT_PUBLIC_
 NEXT_PUBLIC_WA_NUMBER=            # WhatsApp business number with country code, no + (e.g. 233XXXXXXXXX)
 NEXT_PUBLIC_APP_URL=              # e.g. http://localhost:3000
 RESEND_API_KEY=                   # only if transactional email is added later
@@ -570,7 +575,7 @@ RESEND_API_KEY=                   # only if transactional email is added later
 | `/` | Public | Storefront home — hero, featured items, category highlights |
 | `/catalogue` | Public | Full item catalogue with category filter |
 | `/item/[id]` | Public | Item detail — images, description, price, order button |
-| `/login` | Public | Email/password login — no register link, no register route |
+| `/[adminToken]/login` | Public (secret) | Email/password login — path segment must match `ADMIN_LOGIN_TOKEN`, else 404. No register link, no register route. |
 | `/dashboard` | admin, super-admin | Overview stats — total items, stock levels |
 | `/catalogue` (admin) | admin, super-admin | Manage items — add, edit, delete, toggle visibility |
 | `/catalogue/new` | admin, super-admin | Add new item form |
@@ -619,6 +624,7 @@ When in doubt, apply these in order:
 16. `WhatsAppOrderButton` is gold, not green. The WA number comes from `NEXT_PUBLIC_WA_NUMBER`.
 17. Keep components under ~150 lines. Split if larger.
 18. `proxy.ts` at project root — do not rename or move, and do not call it `middleware.ts`.
+19. The login page is never at literal `/login`. It's at `/<ADMIN_LOGIN_TOKEN>/login` (see `lib/admin-login-path.ts`), and unauthenticated redirects from protected routes go to `/`, never to the login path — never hardcode `/login` or redirect to the login path from a public-facing check.
 
 <!-- convex-ai-start -->
 
