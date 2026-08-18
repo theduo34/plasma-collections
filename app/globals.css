@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Dark luxury brand palette — this is the only theme, not a light default with dark overrides. */
+  --pc-black: #0A0A0A;
+  --pc-gold: #C9A227;
+  --pc-gold-light: #E8C84A;
+  --pc-gold-muted: #8B6F1E;
+  --pc-surface: #111111;
+  --pc-border: #1F1F1F;
+  --pc-white: #F5F5F0;
+  --pc-destructive: #DC4444; /* not in the brand palette — standard error red */
+
+  --background: var(--pc-black);
+  --foreground: var(--pc-white);
+
+  --card: var(--pc-surface);
+  --card-foreground: var(--pc-white);
+  --popover: var(--pc-surface);
+  --popover-foreground: var(--pc-white);
+
+  --primary: var(--pc-gold);
+  --primary-foreground: var(--pc-black);
+  --secondary: var(--pc-surface);
+  --secondary-foreground: var(--pc-white);
+
+  --muted: var(--pc-surface);
+  --muted-foreground: var(--pc-gold-muted);
+  --accent: var(--pc-gold-light);
+  --accent-foreground: var(--pc-black);
+
+  --destructive: var(--pc-destructive);
+  --destructive-foreground: var(--pc-white);
+
+  --border: var(--pc-border);
+  --input: var(--pc-border);
+  --ring: var(--pc-gold);
+
+  --radius: 0.5rem;
+}
+
+/* Same values under .dark — kept for shadcn's dark-mode toggle convention. */
+:root.dark {
+  --background: var(--pc-black);
+  --foreground: var(--pc-white);
+
+  --card: var(--pc-surface);
+  --card-foreground: var(--pc-white);
+  --popover: var(--pc-surface);
+  --popover-foreground: var(--pc-white);
+
+  --primary: var(--pc-gold);
+  --primary-foreground: var(--pc-black);
+  --secondary: var(--pc-surface);
+  --secondary-foreground: var(--pc-white);
+
+  --muted: var(--pc-surface);
+  --muted-foreground: var(--pc-gold-muted);
+  --accent: var(--pc-gold-light);
+  --accent-foreground: var(--pc-black);
+
+  --destructive: var(--pc-destructive);
+  --destructive-foreground: var(--pc-white);
+
+  --border: var(--pc-border);
+  --input: var(--pc-border);
+  --ring: var(--pc-gold);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-price: var(--font-jetbrains-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-mono);
 }
