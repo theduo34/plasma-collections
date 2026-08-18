@@ -7,55 +7,37 @@ export async function StorefrontFooter() {
   const phoneNumber = process.env.NEXT_PUBLIC_WA_NUMBER
 
   return (
-    <footer className="border-t border-border bg-secondary">
-      <div className="container-page grid gap-10 py-16 sm:grid-cols-3">
-        <div className="flex flex-col gap-3">
-          <span className="font-sans text-lg font-semibold uppercase tracking-[0.2em] text-foreground">
-            Plasma Collections
-          </span>
-          <p className="text-sm text-muted-foreground">Ghanaian fashion, ordered on WhatsApp.</p>
-        </div>
+    <footer className="dark bg-background">
+      <div className="container-page flex flex-wrap items-center justify-between gap-4 py-8">
+        <span className="font-sans text-sm font-semibold tracking-[0.2em] text-foreground uppercase">
+          Plasma Collections
+        </span>
 
-        <div className="flex flex-col gap-3">
-          <span className="text-sm font-medium uppercase tracking-widest text-foreground">
-            Shop
-          </span>
-          <Link href="/catalogue" className="text-sm text-muted-foreground hover:text-foreground">
-            Full catalogue
-          </Link>
+        <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
           {categories.map((category) => (
             <Link
               key={category._id}
               href={`/catalogue?category=${category.slug}`}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="hover:text-foreground"
             >
               {category.name}
             </Link>
           ))}
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <span className="text-sm font-medium uppercase tracking-widest text-foreground">
-            Contact
-          </span>
           {phoneNumber && (
             <a
               href={`https://wa.me/${phoneNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="hover:text-foreground"
             >
               Chat on WhatsApp
             </a>
           )}
-          <span className="text-sm text-muted-foreground">Accra, Ghana</span>
         </div>
-      </div>
 
-      <div className="border-t border-border">
-        <div className="container-page py-4 text-sm text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} Plasma Collections
-        </div>
+        </span>
       </div>
     </footer>
   )

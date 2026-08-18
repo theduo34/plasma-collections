@@ -1,7 +1,7 @@
 import { fetchQuery } from "convex/nextjs"
 import { api } from "@/convex/_generated/api"
 import { HeroSection } from "@/components/pages/storefront/HeroSection"
-import { ValuePropsSection } from "@/components/pages/storefront/ValuePropsSection"
+import { StatementSection } from "@/components/pages/storefront/StatementSection"
 import { CategoryHighlights } from "@/components/pages/storefront/CategoryHighlights"
 import { FeaturedSection } from "@/components/pages/storefront/FeaturedSection"
 import { CtaSection } from "@/components/pages/storefront/CtaSection"
@@ -18,8 +18,8 @@ export async function StorefrontHomePage() {
 
   return (
     <div className="flex flex-col">
-      <HeroSection chatHref={chatHref} />
-      <ValuePropsSection />
+      <HeroSection />
+      <StatementSection />
       <CategoryHighlights categories={categories} />
       <FeaturedSection />
       <CtaSection chatHref={chatHref} />

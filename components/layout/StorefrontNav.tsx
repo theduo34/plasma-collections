@@ -5,6 +5,10 @@ import Link from "next/link"
 import { WhatsappLogoIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
+// Unscrolled, this sits transparently over HeroSection's dark backdrop (see
+// its -mt-16) with light text via the dark class — assumes whatever's behind
+// it at scroll 0 is dark. True on the homepage today; revisit this if a
+// storefront page with a light top section needs its own nav treatment.
 export function StorefrontNav() {
   const phoneNumber = process.env.NEXT_PUBLIC_WA_NUMBER
   const [scrolled, setScrolled] = useState(false)
@@ -24,7 +28,7 @@ export function StorefrontNav() {
         "sticky top-0 z-10 border-b transition-all duration-300",
         scrolled
           ? "border-border bg-background/85 shadow-sm backdrop-blur"
-          : "border-transparent bg-background"
+          : "dark border-transparent bg-transparent"
       )}
     >
       <nav className="container-page flex h-16 items-center justify-between">

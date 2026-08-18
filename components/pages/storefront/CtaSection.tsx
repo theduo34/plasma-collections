@@ -5,7 +5,7 @@ export function CtaSection({ chatHref }: { chatHref?: string }) {
   if (!chatHref) return null
 
   return (
-    <section className="bg-secondary">
+    <section className="dark bg-background">
       <div className="container-page section-y flex flex-col items-center gap-4 text-center">
         <h2 className="font-sans text-2xl font-semibold tracking-wide text-foreground uppercase">
           Ready to shop?

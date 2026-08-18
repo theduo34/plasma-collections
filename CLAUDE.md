@@ -234,8 +234,8 @@ the-drop/
 │   ├── pages/
 │   │   ├── storefront/
 │   │   │   ├── StorefrontHomePage.tsx    # thin composition — fetches, then assembles the sections below
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── ValuePropsSection.tsx
+│   │   │   ├── HeroSection.tsx           # full-bleed dark hero — see the `dark` section-scoping rule below
+│   │   │   ├── StatementSection.tsx
 │   │   │   ├── CategoryHighlights.tsx
 │   │   │   ├── FeaturedSection.tsx
 │   │   │   ├── CtaSection.tsx
@@ -644,11 +644,13 @@ When in doubt, apply these in order:
 20. Repeated page-layout spacing goes in `app/globals.css` as an `@utility` (`container-page`, `section-y`), not copy-pasted `mx-auto max-w-* px-* py-*` per file.
 21. Third-party brand marks (WhatsApp's logo, any future payment/social logo) keep their own real color and full-size icon — never recolored to gold, never shrunk to a token "dot". Our own chrome (button surfaces, backgrounds) can still be gold; the mark itself can't.
 22. `components/pages/storefront/CtaButton.tsx` is not a duplicate of `components/ui/button.tsx` — it's the deliberately larger marketing CTA for storefront pages (hero, banners), where `components/ui/button.tsx` stays the compact control used in the admin console. Don't collapse them into one; don't hand-roll a third variant either — extend `CtaButton` if a new storefront CTA style is needed.
-23. Any list of ≥3 visually-identical items rendered from data (value props, category cards, nav links, etc.) is a typed, named, module-level array mapped over — never 3+ copy-pasted JSX blocks, never an anonymous array literal inline in the JSX. See `VALUE_PROPS` in `ValuePropsSection.tsx` for the pattern.
+23. Any list of ≥3 visually-identical items rendered from static (non-fetched) data is a typed, named, module-level array mapped over — never 3+ copy-pasted JSX blocks, never an anonymous array literal inline in the JSX.
 24. Import `fetchQuery`/`fetchMutation`/`preloadQuery` directly from `convex/nextjs` at the call site. There is no `lib/convex/` wrapper — one existed, was never imported anywhere, and its `client.ts` half instantiated a second, unauthenticated `ConvexReactClient` completely separate from `providers/ConvexClientProvider.tsx`. Don't recreate it.
 25. Icons: never a hand-typed character standing in for one (no `→`, `✓`, emoji, etc. as a substitute icon) — every icon comes from `@phosphor-icons/react`. Generic icons (arrows, category glyphs, spinners) get no color override — they inherit the surrounding text color, i.e. no `className="text-primary"` decoration. Only a real third-party brand mark (WhatsApp) gets an explicit color, and only its own real brand color (`text-whatsapp`), never ours.
 26. Border radius is `rounded-md` everywhere a card, button, badge, or bordered panel needs rounding — this is a `rounded-none`-by-default (`radix-lyra`) shadcn style, so every `components/ui/*.tsx` file and every hand-written bordered surface has been overridden to `rounded-md` for one consistent radius language project-wide. The one deliberate exception is a circular avatar (`components/shared/Avatar.tsx`) — a profile picture is conventionally a circle, not a rounded square.
 27. When a role is a strict superset of another (super-admin ⊇ admin in `lib/permissions.ts`), express it structurally — spread the smaller role's permission list into the bigger one's — never re-list the same permissions by hand in both places.
+28. To flip a section to the black/gold "dark luxury" palette (the homepage hero, the closing CTA+footer), add `className="dark"` to that section and keep using the normal semantic tokens (`bg-background`, `text-foreground`, `text-muted-foreground`) inside it — the `.dark` CSS scope remaps those tokens to `--pc-black`/`--pc-white`/etc. automatically. Never hardcode a dark-section color directly; if a section needs to look dark, scope it, don't recolor it.
+29. The homepage structure (Option B, approved over an "editorial split" alternative) is: full-bleed dark `HeroSection` (`-mt-16` under the nav) → `StatementSection` (one big line, no card, no icons) → `CategoryHighlights` (edge-to-edge, no gaps, no borders, name overlaid on the block) → `FeaturedSection` (borderless product tiles) → `CtaSection` + `StorefrontFooter` (share the same `dark` scope, no seam between them, deliberately one continuous closing block). Don't reintroduce bordered/boxed sections or reflow this into a symmetric "stack of equal cards" — that's the pattern this replaced.
 
 <!-- convex-ai-start -->
 

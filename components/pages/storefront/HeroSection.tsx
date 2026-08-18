@@ -1,28 +1,22 @@
-import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr"
 import { CtaButton } from "@/components/pages/storefront/CtaButton"
 
-export function HeroSection({ chatHref }: { chatHref?: string }) {
+// Full-bleed campaign block — -mt-16 pulls it up under StorefrontNav's
+// reserved sticky height so the nav overlays it transparently on load.
+export function HeroSection() {
   return (
-    <section className="mx-auto flex max-w-3xl flex-col items-center gap-5 px-6 py-20 text-center">
-      <span className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
-        Ghanaian Fashion House
-      </span>
-      <h1 className="font-sans text-5xl font-semibold tracking-wide text-foreground uppercase sm:text-7xl">
-        Plasma Collections
-      </h1>
-      <p className="max-w-md text-base text-muted-foreground sm:text-lg">
-        Premium clothes, shoes, and repairs — ordered straight through WhatsApp.
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-        <CtaButton href="/catalogue">
+    <section className="dark hero-texture -mt-16 flex min-h-[46rem] items-center justify-center overflow-hidden bg-background text-center">
+      <div className="flex flex-col items-center gap-6 px-6">
+        <span className="text-sm uppercase tracking-[0.35em] text-primary">
+          Ghanaian Fashion House
+        </span>
+        <h1 className="font-sans text-6xl leading-none font-bold tracking-wide text-foreground uppercase sm:text-8xl">
+          Plasma
+          <br />
+          Collections
+        </h1>
+        <CtaButton href="/catalogue" className="mt-2">
           Browse Catalogue
-          <ArrowRightIcon size={16} />
         </CtaButton>
-        {chatHref && (
-          <CtaButton href={chatHref} variant="outline" external>
-            Chat on WhatsApp
-          </CtaButton>
-        )}
       </div>
     </section>
   )

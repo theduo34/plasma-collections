@@ -5,7 +5,7 @@ import type { Item } from "@/features/catalogue/types/item"
 
 export function ItemCard({ item }: { item: Item }) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary">
+    <div className="group flex flex-col">
       <AspectRatio ratio={1} className="relative bg-muted">
         <div className="flex h-full w-full items-center justify-center">
           <ImageIcon className="text-muted-foreground/40" size={40} />
@@ -16,7 +16,7 @@ export function ItemCard({ item }: { item: Item }) {
           </Badge>
         )}
       </AspectRatio>
-      <div className="flex flex-1 flex-col gap-1 p-4">
+      <div className="flex flex-1 flex-col gap-1 pt-3">
         <p className="text-base text-foreground">{item.name}</p>
         <p className="font-price text-base font-medium text-foreground">
           GH₵ {(item.price / 100).toFixed(2)}

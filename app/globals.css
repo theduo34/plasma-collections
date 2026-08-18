@@ -164,6 +164,18 @@
   @apply py-14;
 }
 
+/* Subtle diagonal accent lines for the hero's dark backdrop — sourced from
+   --primary via color-mix(), never a new hardcoded color. */
+@utility hero-texture {
+  background-image: repeating-linear-gradient(
+    115deg,
+    transparent,
+    transparent 68px,
+    color-mix(in oklch, var(--primary) 35%, transparent) 68px,
+    color-mix(in oklch, var(--primary) 35%, transparent) 69px
+  );
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

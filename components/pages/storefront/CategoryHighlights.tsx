@@ -1,43 +1,29 @@
 import Link from "next/link"
-import type { Icon } from "@phosphor-icons/react"
-import { ScissorsIcon, SneakerIcon, TagIcon, TShirtIcon } from "@phosphor-icons/react/dist/ssr"
 import type { Category } from "@/features/catalogue/types/item"
 
-// Falls back to a generic tag icon for any category slug added later that
-// isn't one of the three the storefront launched with.
-const CATEGORY_ICONS: Record<string, Icon> = {
-  clothes: TShirtIcon,
-  shoes: SneakerIcon,
-  repairs: ScissorsIcon,
-}
-
+// Edge-to-edge photo-block treatment — no gaps, no borders, category name
+// overlaid directly on the (placeholder, for now) image. bg-foreground /
+// text-background stand in for a real product photo: swapping the theme's
+// two neutrals gives a dark placeholder block without inventing a new color.
 export function CategoryHighlights({ categories }: { categories: Category[] }) {
   if (categories.length === 0) return null
 
   return (
-    <section className="bg-secondary/40">
-      <div className="container-page section-y">
-        <h2 className="mb-6 text-sm font-medium tracking-widest text-foreground uppercase">
-          Shop by Category
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {categories.map((category) => {
-            const CategoryIcon = CATEGORY_ICONS[category.slug] ?? TagIcon
-            return (
-              <Link
-                key={category._id}
-                href={`/catalogue?category=${category.slug}`}
-                className="flex flex-col items-center gap-3 rounded-md border border-border bg-background px-6 py-8 text-center transition-colors hover:border-primary"
-              >
-                <CategoryIcon size={32} />
-                <span className="text-sm font-medium tracking-widest text-foreground uppercase">
-                  {category.name}
-                </span>
-              </Link>
-            )
-          })}
-        </div>
-      </div>
+    <section className="flex min-h-[28rem]">
+      {categories.map((category) => (
+        <Link
+          key={category._id}
+          href={`/catalogue?category=${category.slug}`}
+          className="group relative flex flex-1 items-end bg-foreground p-8 transition-opacity hover:opacity-90"
+        >
+          <div>
+            <span className="font-sans text-2xl font-semibold tracking-wide text-background uppercase">
+              {category.name}
+            </span>
+            <div className="mt-2 h-0.5 w-9 bg-primary" />
+          </div>
+        </Link>
+      ))}
     </section>
   )
 }
