@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   /* Dark luxury brand palette — this is the only theme, not a light default with dark overrides. */
@@ -107,4 +111,10 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-mono);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
 }
