@@ -6,6 +6,7 @@ export const create = mutation({
   args: {
     name: v.string(),
     slug: v.string(),
+    description: v.optional(v.string()),
     order: v.number(),
   },
   handler: async (ctx, args) => {
@@ -19,6 +20,7 @@ export const update = mutation({
     categoryId: v.id("categories"),
     name: v.optional(v.string()),
     slug: v.optional(v.string()),
+    description: v.optional(v.string()),
     order: v.optional(v.number()),
   },
   handler: async (ctx, args) => {

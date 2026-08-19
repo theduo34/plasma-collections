@@ -18,6 +18,7 @@ export default defineSchema({
   categories: defineTable({
     name: v.string(),                          // e.g. "Clothes", "Shoes", "Repairs"
     slug: v.string(),                          // e.g. "clothes", "shoes", "repairs"
+    description: v.optional(v.string()),       // short, one line — shown under the category heading
     order: v.number(),                         // display order
     imageStorageId: v.optional(v.id("_storage")),
   }).index("by_slug", ["slug"]),

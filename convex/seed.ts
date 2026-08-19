@@ -4,9 +4,9 @@ import type { Id } from "./_generated/dataModel"
 const SEED_USER_EMAIL = "seed-script@plasma.internal"
 
 const CATEGORIES = [
-  { name: "Clothes", slug: "clothes", order: 0 },
-  { name: "Shoes", slug: "shoes", order: 1 },
-  { name: "Repairs", slug: "repairs", order: 2 },
+  { name: "Clothes", slug: "clothes", order: 0, description: "Everyday and occasion wear, tailored to fit." },
+  { name: "Shoes", slug: "shoes", order: 1, description: "Leather, suede, and canvas — built to last." },
+  { name: "Repairs", slug: "repairs", order: 2, description: "Give what you already own a second life." },
 ] as const
 
 const ITEMS: Array<{
@@ -190,6 +190,22 @@ export const seedStorefront = internalMutation({
         createdAt: now,
         updatedAt: now,
       })
+    }
+  },
+})
+
+// Dev-only — backfills the description field onto categories seeded before
+// it existed. Safe to re-run; only touches categories missing a description.
+export const backfillCategoryDescriptions = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const categories = await ctx.db.query("categories").collect()
+    for (const category of categories) {
+      if (category.description !== undefined) continue
+      const seedCategory = CATEGORIES.find((c) => c.slug === category.slug)
+      if (seedCategory) {
+        await ctx.db.patch(category._id, { description: seedCategory.description })
+      }
     }
   },
 })
