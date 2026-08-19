@@ -21,7 +21,7 @@ export function CategoryFilter({
   ]
 
   return (
-    <div className="flex gap-2">
+    <div className="inline-flex items-center gap-1 rounded-full border border-border p-1">
       {entries.map((entry) => (
         <button
           key={entry.id ?? "all"}
@@ -29,10 +29,10 @@ export function CategoryFilter({
           aria-pressed={selected === entry.id}
           onClick={() => onSelect(entry.id)}
           className={cn(
-            "rounded-md border px-4 py-1.5 text-sm uppercase tracking-wide transition-colors",
+            "rounded-full px-4 py-1.5 text-sm uppercase tracking-wide transition-colors",
             selected === entry.id
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border text-foreground hover:border-primary"
+              ? "bg-primary text-primary-foreground"
+              : "text-foreground hover:bg-muted"
           )}
         >
           {entry.name}

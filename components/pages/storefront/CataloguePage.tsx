@@ -18,7 +18,7 @@ function CatalogueSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 8 }).map((_, index) => (
-        <Skeleton key={index} className="aspect-square" />
+        <Skeleton key={index} className="aspect-square rounded-lg" />
       ))}
     </div>
   )
