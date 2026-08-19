@@ -37,7 +37,7 @@ export function CatalogueSearchBar({
       <div className="container-page">
         <label
           className={cn(
-            "mx-auto flex max-w-xl items-center gap-3 rounded-full border border-border bg-background px-5 transition-all duration-300",
+            "mx-auto flex max-w-xl items-center gap-3 rounded-full border border-border bg-background px-5 transition-all duration-300 hover:border-muted-foreground focus-within:border-primary",
             collapsed ? "h-10" : "h-12"
           )}
         >
@@ -46,7 +46,7 @@ export function CatalogueSearchBar({
             type="search"
             value={value}
             onChange={(event) => onChange(event.target.value)}
-            placeholder="Search the catalogue…"
+            placeholder="Search items…"
             className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           />
         </label>

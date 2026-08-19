@@ -77,11 +77,7 @@ export function CatalogueBrowser() {
         ) : items.length > 0 ? (
           <div className="flex flex-col gap-12">
             {categories.map((category) => (
-              <CatalogueCategoryRow
-                key={category._id}
-                category={category}
-                items={items.filter((item) => item.categoryId === category._id)}
-              />
+              <CatalogueCategoryRow key={category._id} category={category} />
             ))}
           </div>
         ) : (

@@ -2,29 +2,37 @@
 
 import { useRef } from "react"
 import Link from "next/link"
+import { usePaginatedQuery } from "convex/react"
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react"
+import { api } from "@/convex/_generated/api"
+import { Skeleton } from "@/components/ui/skeleton"
 import { CatalogueItemCard } from "@/features/catalogue/components/CatalogueItemCard"
-import type { PublicCategory, PublicItem } from "@/features/catalogue/types/item"
+import type { PublicCategory } from "@/features/catalogue/types/item"
+
+const INITIAL_BATCH = 6
+const LOAD_MORE_BATCH = 6
+
+const CARD_WIDTH = "w-[calc((100%-1rem)/2)] shrink-0 sm:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-4rem)/5)]"
 
 // Airbnb-style browse row: title + "view all", a horizontally scrollable
 // strip of cards (2 visible on mobile, 5 on large screens), and left/right
-// nav buttons that page through it by one screen's worth at a time.
-export function CatalogueCategoryRow({
-  category,
-  items,
-}: {
-  category: PublicCategory
-  items: PublicItem[]
-}) {
+// nav buttons that page through it. Only an initial batch loads with the
+// row — paging past what's loaded with the next arrow fetches more.
+export function CatalogueCategoryRow({ category }: { category: PublicCategory }) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.public.items.listByCategoryPage,
+    { categoryId: category._id },
+    { initialNumItems: INITIAL_BATCH }
+  )
 
   function scrollByPage(direction: 1 | -1) {
     const el = scrollRef.current
-    if (!el) return
-    el.scrollBy({ left: direction * el.clientWidth, behavior: "smooth" })
+    if (el) el.scrollBy({ left: direction * el.clientWidth, behavior: "smooth" })
+    if (direction === 1 && status === "CanLoadMore") loadMore(LOAD_MORE_BATCH)
   }
 
-  if (items.length === 0) return null
+  if (status !== "LoadingFirstPage" && results.length === 0) return null
 
   return (
     <section className="flex flex-col gap-4">
@@ -65,14 +73,17 @@ export function CatalogueCategoryRow({
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {items.map((item) => (
-          <div
-            key={item._id}
-            className="w-[calc((100%-1rem)/2)] shrink-0 sm:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-4rem)/5)]"
-          >
-            <CatalogueItemCard item={item} />
-          </div>
-        ))}
+        {status === "LoadingFirstPage"
+          ? Array.from({ length: INITIAL_BATCH }).map((_, index) => (
+              <div key={index} className={CARD_WIDTH}>
+                <Skeleton className="aspect-square rounded-lg" />
+              </div>
+            ))
+          : results.map((item) => (
+              <div key={item._id} className={CARD_WIDTH}>
+                <CatalogueItemCard item={item} />
+              </div>
+            ))}
       </div>
     </section>
   )
