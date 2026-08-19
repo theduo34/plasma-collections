@@ -15,7 +15,12 @@ export function ItemStatusBadges({ item }: { item: PublicItem }) {
         </Badge>
       )}
       {item.isNew && item.inStock && (
-        <Badge className="absolute top-2 right-2 rounded-full">New</Badge>
+        <Badge
+          variant="outline"
+          className="absolute top-2 right-2 rounded-full border-transparent bg-foreground text-background"
+        >
+          New
+        </Badge>
       )}
     </>
   )
