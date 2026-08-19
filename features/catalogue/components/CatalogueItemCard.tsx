@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ImageIcon } from "@phosphor-icons/react/dist/ssr"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Badge } from "@/components/ui/badge"
+import { ItemStatusBadges } from "@/features/catalogue/components/ItemStatusBadges"
 import type { PublicItem } from "@/features/catalogue/types/item"
 
 export function CatalogueItemCard({ item }: { item: PublicItem }) {
@@ -25,11 +25,7 @@ export function CatalogueItemCard({ item }: { item: PublicItem }) {
             <ImageIcon className="text-muted-foreground/40" size={32} />
           </div>
         )}
-        {!item.inStock && (
-          <Badge variant="secondary" className="absolute top-2 left-2 rounded-full">
-            Sold out
-          </Badge>
-        )}
+        <ItemStatusBadges item={item} />
       </AspectRatio>
       <div className="flex flex-col gap-0.5">
         <p className="truncate text-sm text-foreground">{item.name}</p>
