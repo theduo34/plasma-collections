@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { MagnifyingGlassIcon } from "@phosphor-icons/react"
+import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 const COLLAPSE_THRESHOLD = 80
@@ -12,9 +12,13 @@ const COLLAPSE_THRESHOLD = 80
 export function CatalogueSearchBar({
   value,
   onChange,
+  activeCategoryName,
+  onClearCategory,
 }: {
   value: string
   onChange: (value: string) => void
+  activeCategoryName?: string | null
+  onClearCategory?: () => void
 }) {
   const [collapsed, setCollapsed] = useState(false)
 
@@ -34,10 +38,10 @@ export function CatalogueSearchBar({
         collapsed ? "border-border py-2 shadow-sm" : "py-5"
       )}
     >
-      <div className="container-page">
+      <div className="container-page flex flex-col items-center gap-2">
         <label
           className={cn(
-            "mx-auto flex max-w-xl items-center gap-3 rounded-full border border-border bg-background px-5 transition-all duration-300 hover:border-muted-foreground focus-within:border-primary",
+            "mx-auto flex w-full max-w-xl items-center gap-3 rounded-full border border-border bg-background px-5 transition-all duration-300 hover:border-muted-foreground focus-within:border-primary",
             collapsed ? "h-10" : "h-12"
           )}
         >
@@ -50,6 +54,17 @@ export function CatalogueSearchBar({
             className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           />
         </label>
+
+        {activeCategoryName && (
+          <button
+            type="button"
+            onClick={onClearCategory}
+            className="flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-3 py-1 text-xs tracking-wide text-foreground uppercase transition-colors hover:border-primary hover:bg-muted"
+          >
+            {activeCategoryName}
+            <XIcon size={12} />
+          </button>
+        )}
       </div>
     </div>
   )
