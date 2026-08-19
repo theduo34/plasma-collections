@@ -35,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <body className="min-h-full flex flex-col bg-background text-foreground">
           <ConvexClientProvider>
             {children}
-            <Toaster theme="light" />
+            <Toaster theme="light" position="top-center" />
           </ConvexClientProvider>
         </body>
       </html>

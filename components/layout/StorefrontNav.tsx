@@ -2,16 +2,22 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { WhatsappLogoIcon } from "@phosphor-icons/react"
+import { usePathname } from "next/navigation"
+import { ShoppingBagIcon, WhatsappLogoIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { useOrderCart } from "@/features/order/hooks/useOrderCart"
+import { OrderSummarySheet } from "@/features/order/components/OrderSummarySheet"
 
-// Unscrolled, this sits transparently over HeroSection's dark backdrop (see
-// its -mt-16) with light text via the dark class — assumes whatever's behind
-// it at scroll 0 is dark. True on the homepage today; revisit this if a
-// storefront page with a light top section needs its own nav treatment.
+// Unscrolled + transparent-dark only applies on "/", where HeroSection's dark
+// backdrop (see its -mt-16) sits directly behind the nav. Every other public
+// page has a light top section, so the nav stays in its normal light/solid
+// treatment there — otherwise the logo and links render light-on-light.
 export function StorefrontNav() {
   const phoneNumber = process.env.NEXT_PUBLIC_WA_NUMBER
+  const pathname = usePathname()
+  const { count } = useOrderCart()
   const [scrolled, setScrolled] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
 
   useEffect(() => {
     function onScroll() {
@@ -22,13 +28,15 @@ export function StorefrontNav() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  const overDarkHero = pathname === "/" && !scrolled
+
   return (
     <header
       className={cn(
         "sticky top-0 z-10 border-b transition-all duration-300",
-        scrolled
-          ? "border-border bg-background/85 shadow-sm backdrop-blur"
-          : "dark border-transparent bg-transparent"
+        overDarkHero
+          ? "dark border-transparent bg-transparent"
+          : "border-border bg-background/85 shadow-sm backdrop-blur"
       )}
     >
       <nav className="container-page flex h-16 items-center justify-between">
@@ -46,6 +54,19 @@ export function StorefrontNav() {
           >
             Catalogue
           </Link>
+          <button
+            type="button"
+            aria-label="View cart"
+            onClick={() => setCartOpen(true)}
+            className="relative flex size-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
+          >
+            <ShoppingBagIcon size={22} />
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                {count}
+              </span>
+            )}
+          </button>
           {phoneNumber && (
             <a
               href={`https://wa.me/${phoneNumber}`}
@@ -60,6 +81,8 @@ export function StorefrontNav() {
           )}
         </div>
       </nav>
+
+      <OrderSummarySheet open={cartOpen} onOpenChange={setCartOpen} />
     </header>
   )
 }

@@ -1,18 +1,23 @@
 'use client'
 
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeftIcon, ImageIcon } from "@phosphor-icons/react"
+import { toast } from "sonner"
+import { ArrowLeftIcon, ImageIcon, ShoppingBagIcon } from "@phosphor-icons/react"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { WhatsAppOrderButton } from "@/features/catalogue/components/WhatsAppOrderButton"
+import { QuantityStepper } from "@/features/order/components/QuantityStepper"
+import { useOrderCart } from "@/features/order/hooks/useOrderCart"
 import { usePublicItem } from "@/features/catalogue/hooks/usePublicItem"
 import type { Id } from "@/convex/_generated/dataModel"
 
 export function ItemDetailPage({ itemId }: { itemId: Id<"items"> }) {
   const item = usePublicItem(itemId)
+  const { addItem } = useOrderCart()
+  const [quantity, setQuantity] = useState(1)
 
   if (item === undefined) {
     return (
@@ -78,9 +83,20 @@ export function ItemDetailPage({ itemId }: { itemId: Id<"items"> }) {
           {item.description && <p className="text-sm text-muted-foreground">{item.description}</p>}
 
           {item.inStock ? (
-            <WhatsAppOrderButton
-              items={[{ name: item.name, price: item.price, quantity: 1 }]}
-            />
+            <div className="flex items-center gap-3">
+              <QuantityStepper quantity={quantity} onChange={setQuantity} />
+              <button
+                type="button"
+                onClick={() => {
+                  addItem({ itemId: item._id, name: item.name, price: item.price, quantity })
+                  toast.success(`Added ${item.name} to cart`)
+                }}
+                className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-base font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                <ShoppingBagIcon size={20} />
+                Add to Cart
+              </button>
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground">Currently sold out — check back soon.</p>
           )}
