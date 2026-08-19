@@ -59,8 +59,8 @@ export function ItemImageCarousel({ images, alt }: { images: string[]; alt: stri
 
       {images.length > 1 && (
         <>
-          <CarouselPrevious className="left-3 bg-background/70 backdrop-blur-sm hover:bg-background" />
-          <CarouselNext className="right-3 bg-background/70 backdrop-blur-sm hover:bg-background" />
+          <CarouselPrevious className="left-3 rounded-full bg-background/70 backdrop-blur-sm hover:bg-background" />
+          <CarouselNext className="right-3 rounded-full bg-background/70 backdrop-blur-sm hover:bg-background" />
           <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
             {images.map((_, index) => (
               <span

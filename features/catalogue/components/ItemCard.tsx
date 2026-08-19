@@ -8,7 +8,7 @@ import type { PublicItem } from "@/features/catalogue/types/item"
 export function ItemCard({ item }: { item: PublicItem }) {
   return (
     <Link href={`/item/${item._id}`} className="group flex flex-col">
-      <AspectRatio ratio={1} className="relative overflow-hidden bg-muted">
+      <AspectRatio ratio={1} className="relative overflow-hidden rounded-md border border-border bg-muted">
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}

@@ -54,7 +54,7 @@ export function CatalogueCategoryRow({ category }: { category: PublicCategory })
             <p className="text-sm text-muted-foreground">{category.description}</p>
           )}
         </div>
-        <div className="hidden shrink-0 items-center gap-2 sm:flex">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
             aria-label="Scroll left"
