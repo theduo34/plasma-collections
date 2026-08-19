@@ -1,20 +1,24 @@
 'use client'
 
+import { cn } from "@/lib/utils"
 import { usePublicItems } from "@/features/catalogue/hooks/usePublicItems"
 import { ItemGrid } from "@/features/catalogue/components/ItemGrid"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const FEATURED_COUNT = 8
+const FEATURED_COUNT = 10
 
 export function FeaturedItems() {
   const items = usePublicItems()
 
   if (items === undefined) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-5">
         {Array.from({ length: FEATURED_COUNT }).map((_, index) => (
-          <Skeleton key={index} className="aspect-square" />
+          <Skeleton
+            key={index}
+            className={cn("aspect-square rounded-md", index >= 6 && "hidden lg:block")}
+          />
         ))}
       </div>
     )
