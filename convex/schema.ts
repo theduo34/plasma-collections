@@ -27,7 +27,7 @@ export default defineSchema({
     description: v.optional(v.string()),
     price: v.number(),                         // in GHS pesewas (multiply by 100) — future-proofs Paystack
     categoryId: v.id("categories"),
-    imageStorageId: v.optional(v.id("_storage")),
+    imageStorageIds: v.optional(v.array(v.id("_storage"))), // first is the primary/thumbnail image
     inStock: v.boolean(),
     isVisible: v.boolean(),                    // admin can hide without deleting
     createdBy: v.id("users"),

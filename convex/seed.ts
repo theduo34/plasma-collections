@@ -88,6 +88,65 @@ const ITEMS: Array<{
   },
 ]
 
+const MORE_ITEMS: typeof ITEMS = [
+  {
+    name: "Silk Head Scarf",
+    description: "Hand-rolled edge silk scarf in a bold Ankara-inspired print.",
+    price: 12000,
+    categorySlug: "clothes",
+    inStock: true,
+  },
+  {
+    name: "Indigo Denim Jacket",
+    description: "Washed denim jacket with mother-of-pearl buttons.",
+    price: 32000,
+    categorySlug: "clothes",
+    inStock: true,
+  },
+  {
+    name: "Linen Shirt",
+    description: "Breathable linen shirt, relaxed fit for the harmattan season.",
+    price: 17000,
+    categorySlug: "clothes",
+    inStock: true,
+  },
+  {
+    name: "Canvas Sneakers",
+    description: "Low-top canvas sneakers with a rubber sole.",
+    price: 21000,
+    categorySlug: "shoes",
+    inStock: true,
+  },
+  {
+    name: "Oxford Shoes",
+    description: "Polished leather Oxfords for formal wear.",
+    price: 39000,
+    categorySlug: "shoes",
+    inStock: false,
+  },
+  {
+    name: "Wedge Sandals",
+    description: "Cork wedge sandals with an adjustable ankle strap.",
+    price: 24000,
+    categorySlug: "shoes",
+    inStock: true,
+  },
+  {
+    name: "Zipper Replacement",
+    description: "Full zipper swap for jackets, bags, and boots.",
+    price: 5000,
+    categorySlug: "repairs",
+    inStock: true,
+  },
+  {
+    name: "Button & Trim Restoration",
+    description: "Replace missing buttons and refresh worn trim.",
+    price: 4000,
+    categorySlug: "repairs",
+    inStock: true,
+  },
+]
+
 // Dev-only fixture data — refuses to run if the catalogue isn't empty, so it
 // can never clobber real categories/items added later via the admin console.
 export const seedStorefront = internalMutation({
@@ -128,6 +187,44 @@ export const seedStorefront = internalMutation({
         inStock: item.inStock,
         isVisible: true,
         createdBy: seedUser!._id,
+        createdAt: now,
+        updatedAt: now,
+      })
+    }
+  },
+})
+
+// Dev-only — additive on top of an already-seeded catalogue. Skips any item
+// whose name already exists, so it's safe to re-run.
+export const addMoreItems = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const seedUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", SEED_USER_EMAIL))
+      .unique()
+    if (seedUser === null) {
+      throw new Error("Run seedStorefront first — no seed user found.")
+    }
+
+    const categories = await ctx.db.query("categories").collect()
+    const categoryIds = Object.fromEntries(
+      categories.map((category) => [category.slug, category._id])
+    ) as Record<(typeof CATEGORIES)[number]["slug"], Id<"categories">>
+
+    const existingNames = new Set((await ctx.db.query("items").collect()).map((item) => item.name))
+
+    const now = Date.now()
+    for (const item of MORE_ITEMS) {
+      if (existingNames.has(item.name)) continue
+      await ctx.db.insert("items", {
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        categoryId: categoryIds[item.categorySlug],
+        inStock: item.inStock,
+        isVisible: true,
+        createdBy: seedUser._id,
         createdAt: now,
         updatedAt: now,
       })

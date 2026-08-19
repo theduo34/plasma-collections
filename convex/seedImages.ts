@@ -9,6 +9,8 @@ import type { Id } from "./_generated/dataModel"
 // here needs to be ripped out once admins start uploading real photos, it
 // just stops finding anything left to fill in. Safe to re-run.
 
+const IMAGES_PER_ITEM = 3
+
 async function fetchAndStore(ctx: ActionCtx, seed: string): Promise<Id<"_storage">> {
   const response = await fetch(`https://picsum.photos/seed/${encodeURIComponent(seed)}/900/900`)
   if (!response.ok) {
@@ -23,8 +25,10 @@ export const seedPlaceholderImages = internalAction({
   handler: async (ctx) => {
     const itemIds = await ctx.runQuery(internal.seedImages.listItemsWithoutImage, {})
     for (const itemId of itemIds) {
-      const storageId = await fetchAndStore(ctx, itemId)
-      await ctx.runMutation(internal.seedImages.setItemImage, { itemId, storageId })
+      const storageIds = await Promise.all(
+        Array.from({ length: IMAGES_PER_ITEM }, (_, index) => fetchAndStore(ctx, `${itemId}-${index}`))
+      )
+      await ctx.runMutation(internal.seedImages.setItemImages, { itemId, storageIds })
     }
 
     const categoryIds = await ctx.runQuery(internal.seedImages.listCategoriesWithoutImage, {})
@@ -39,7 +43,7 @@ export const listItemsWithoutImage = internalQuery({
   args: {},
   handler: async (ctx) => {
     const items = await ctx.db.query("items").collect()
-    return items.filter((item) => !item.imageStorageId).map((item) => item._id)
+    return items.filter((item) => !item.imageStorageIds?.length).map((item) => item._id)
   },
 })
 
@@ -51,10 +55,10 @@ export const listCategoriesWithoutImage = internalQuery({
   },
 })
 
-export const setItemImage = internalMutation({
-  args: { itemId: v.id("items"), storageId: v.id("_storage") },
+export const setItemImages = internalMutation({
+  args: { itemId: v.id("items"), storageIds: v.array(v.id("_storage")) },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.itemId, { imageStorageId: args.storageId })
+    await ctx.db.patch(args.itemId, { imageStorageIds: args.storageIds })
   },
 })
 

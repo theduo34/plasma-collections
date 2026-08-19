@@ -3,9 +3,14 @@ import { v } from "convex/values"
 import { query, type QueryCtx } from "../_generated/server"
 import type { Doc } from "../_generated/dataModel"
 
+const NEW_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
+
 async function withImageUrl(ctx: QueryCtx, item: Doc<"items">) {
-  const imageUrl = item.imageStorageId ? await ctx.storage.getUrl(item.imageStorageId) : null
-  return { ...item, imageUrl }
+  const storageIds = item.imageStorageIds ?? []
+  const resolved = await Promise.all(storageIds.map((id) => ctx.storage.getUrl(id)))
+  const imageUrls = resolved.filter((url): url is string => url !== null)
+  const isNew = Date.now() - item.createdAt < NEW_WINDOW_MS
+  return { ...item, imageUrls, imageUrl: imageUrls[0] ?? null, isNew }
 }
 
 // Only returns visible items.
