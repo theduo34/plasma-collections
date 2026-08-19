@@ -8,14 +8,14 @@ import type { PublicItem } from "@/features/catalogue/types/item"
 export function ItemCard({ item }: { item: PublicItem }) {
   return (
     <Link href={`/item/${item._id}`} className="group flex flex-col">
-      <AspectRatio ratio={1} className="relative bg-muted">
+      <AspectRatio ratio={1} className="relative overflow-hidden bg-muted">
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}
             alt={item.name}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover transition-opacity group-hover:opacity-90"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
