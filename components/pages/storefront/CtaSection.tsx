@@ -5,9 +5,9 @@ export function CtaSection({ chatHref }: { chatHref?: string }) {
   if (!chatHref) return null
 
   return (
-    <section className="dark bg-background">
-      <div className="container-page section-y flex flex-col items-center gap-4 text-center">
-        <h2 className="font-sans text-2xl font-semibold tracking-wide text-foreground uppercase">
+    <section className="dark hero-texture bg-background">
+      <div className="container-page flex flex-col items-center gap-4 py-20 text-center sm:py-28">
+        <h2 className="font-sans text-3xl font-semibold tracking-wide text-foreground uppercase sm:text-4xl">
           Ready to shop?
         </h2>
         <p className="max-w-md text-base text-muted-foreground">
