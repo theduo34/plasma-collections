@@ -5,6 +5,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { BasketIcon, WhatsappLogoIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useOrderCart } from "@/features/order/hooks/useOrderCart"
 import { OrderSummarySheet } from "@/features/order/components/OrderSummarySheet"
 
@@ -47,37 +49,49 @@ export function StorefrontNav() {
           Plasma Collections
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
           <Link
             href="/catalogue"
-            className="text-sm uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+            className="mr-2 text-sm uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
           >
             Catalogue
           </Link>
-          <button
-            type="button"
-            aria-label="View cart"
-            onClick={() => setCartOpen(true)}
-            className="relative flex size-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
-          >
-            <BasketIcon size={22} />
-            {count > 0 && (
-              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-                {count}
-              </span>
-            )}
-          </button>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label="View cart"
+                onClick={() => setCartOpen(true)}
+                className="relative flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted"
+              >
+                <BasketIcon size={22} />
+                {count > 0 && (
+                  <Badge className="absolute -top-1 -right-1 size-5 rounded-full p-0 text-[10px]">
+                    {count}
+                  </Badge>
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>View cart</TooltipContent>
+          </Tooltip>
+
           {phoneNumber && (
-            <a
-              href={`https://wa.me/${phoneNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat on WhatsApp"
-              className="flex size-10 items-center justify-center rounded-md transition-colors hover:bg-muted"
-            >
-              {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
-              <WhatsappLogoIcon className="text-whatsapp" size={22} weight="fill" />
-            </a>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href={`https://wa.me/${phoneNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat on WhatsApp"
+                  className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-muted"
+                >
+                  {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
+                  <WhatsappLogoIcon className="text-whatsapp" size={22} weight="fill" />
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>Chat on WhatsApp</TooltipContent>
+            </Tooltip>
           )}
         </div>
       </nav>
