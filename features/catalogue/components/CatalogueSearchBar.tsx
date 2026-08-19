@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import { MagnifyingGlassIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { CategoryFilter } from "@/features/catalogue/components/CategoryFilter"
-import type { Category } from "@/features/catalogue/types/item"
 
 const COLLAPSE_THRESHOLD = 80
 
@@ -11,13 +10,11 @@ const COLLAPSE_THRESHOLD = 80
 // (shrinks + gains a border/shadow) as you scroll down, sticking flush
 // against the nav — and un-folds again as you scroll back toward the top.
 export function CatalogueSearchBar({
-  categories,
-  selected,
-  onSelect,
+  value,
+  onChange,
 }: {
-  categories: Category[]
-  selected: string | null
-  onSelect: (categoryId: string | null) => void
+  value: string
+  onChange: (value: string) => void
 }) {
   const [collapsed, setCollapsed] = useState(false)
 
@@ -38,7 +35,21 @@ export function CatalogueSearchBar({
       )}
     >
       <div className="container-page">
-        <CategoryFilter categories={categories} selected={selected} onSelect={onSelect} />
+        <label
+          className={cn(
+            "mx-auto flex max-w-xl items-center gap-3 rounded-full border border-border bg-background px-5 transition-all duration-300",
+            collapsed ? "h-10" : "h-12"
+          )}
+        >
+          <MagnifyingGlassIcon size={18} className="shrink-0 text-muted-foreground" />
+          <input
+            type="search"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder="Search the catalogue…"
+            className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          />
+        </label>
       </div>
     </div>
   )

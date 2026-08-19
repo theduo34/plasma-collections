@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useMemo, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { usePublicItems } from "@/features/catalogue/hooks/usePublicItems"
 import { usePublicCategories } from "@/features/catalogue/hooks/usePublicCategories"
 import { CatalogueSearchBar } from "@/features/catalogue/components/CatalogueSearchBar"
@@ -13,21 +13,20 @@ import { Skeleton } from "@/components/ui/skeleton"
 export function CatalogueBrowser() {
   const items = usePublicItems()
   const categories = usePublicCategories()
-  const router = useRouter()
   const searchParams = useSearchParams()
+  const [search, setSearch] = useState("")
 
   const categorySlug = searchParams.get("category")
   const selectedCategory = categories?.find((category) => category.slug === categorySlug) ?? null
 
-  function handleSelect(categoryId: string | null) {
-    const slug = categories?.find((category) => category._id === categoryId)?.slug
-    const params = new URLSearchParams(searchParams)
-    if (slug) params.set("category", slug)
-    else params.delete("category")
-    router.replace(`/catalogue${params.size > 0 ? `?${params}` : ""}`, { scroll: false })
-  }
+  const query = search.trim().toLowerCase()
 
-  const filteredItems = useMemo(() => {
+  const searchResults = useMemo(() => {
+    if (!items || !query) return undefined
+    return items.filter((item) => item.name.toLowerCase().includes(query))
+  }, [items, query])
+
+  const categoryResults = useMemo(() => {
     if (!items || !selectedCategory) return undefined
     return items.filter((item) => item.categoryId === selectedCategory._id)
   }, [items, selectedCategory])
@@ -46,19 +45,26 @@ export function CatalogueBrowser() {
 
   return (
     <div className="flex flex-col">
-      {categories.length > 0 && (
-        <CatalogueSearchBar
-          categories={categories}
-          selected={selectedCategory?._id ?? null}
-          onSelect={handleSelect}
-        />
-      )}
+      <CatalogueSearchBar value={search} onChange={setSearch} />
 
       <div className="container-page flex flex-col gap-10 pt-6 pb-14">
-        {selectedCategory ? (
-          filteredItems && filteredItems.length > 0 ? (
+        {query ? (
+          searchResults && searchResults.length > 0 ? (
             <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-              {filteredItems.map((item) => (
+              {searchResults.map((item) => (
+                <CatalogueItemCard key={item._id} item={item} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No matches"
+              description={`No items found for "${search.trim()}".`}
+            />
+          )
+        ) : selectedCategory ? (
+          categoryResults && categoryResults.length > 0 ? (
+            <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+              {categoryResults.map((item) => (
                 <CatalogueItemCard key={item._id} item={item} />
               ))}
             </div>
