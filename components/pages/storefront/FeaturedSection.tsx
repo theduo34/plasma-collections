@@ -12,10 +12,12 @@ export function FeaturedSection() {
           </h2>
           <Link
             href="/catalogue"
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
             View full catalogue
-            <ArrowRightIcon size={14} />
+            <span className="flex size-8 items-center justify-center rounded-full border border-border bg-muted/60 text-foreground transition-colors group-hover:bg-muted">
+              <ArrowRightIcon size={14} />
+            </span>
           </Link>
         </div>
         <FeaturedItems />
