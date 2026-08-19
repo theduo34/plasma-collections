@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import Link from "next/link"
 import { usePaginatedQuery } from "convex/react"
-import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react"
+import { CaretLeftIcon, CaretRightIcon, ArrowRightIcon } from "@phosphor-icons/react"
 import { api } from "@/convex/_generated/api"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CatalogueItemCard } from "@/features/catalogue/components/CatalogueItemCard"
@@ -43,7 +43,12 @@ export function CatalogueCategoryRow({ category }: { category: PublicCategory })
             className="group flex items-center gap-1.5 text-lg font-medium tracking-wide text-foreground uppercase"
           >
             {category.name}
-            <CaretRightIcon size={16} className="transition-transform group-hover:translate-x-1" />
+            <button
+                type="button"
+                className="flex size-8 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:shadow-xl bg-muted/60 hover:bg-muted"
+            >
+              <ArrowRightIcon size={14}/>
+            </button>
           </Link>
           {category.description && (
             <p className="text-sm text-muted-foreground">{category.description}</p>
@@ -54,7 +59,7 @@ export function CatalogueCategoryRow({ category }: { category: PublicCategory })
             type="button"
             aria-label="Scroll left"
             onClick={() => scrollByPage(-1)}
-            className="flex size-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary hover:bg-muted"
+            className="flex size-8 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:shadow-xl bg-muted/60 hover:bg-muted"
           >
             <CaretLeftIcon size={14} />
           </button>
@@ -62,7 +67,7 @@ export function CatalogueCategoryRow({ category }: { category: PublicCategory })
             type="button"
             aria-label="Scroll right"
             onClick={() => scrollByPage(1)}
-            className="flex size-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary hover:bg-muted"
+            className="flex size-8 items-center justify-center rounded-full border border-border text-foreground transition-colorshover:shadow-xl bg-muted/60 hover:bg-muted"
           >
             <CaretRightIcon size={14} />
           </button>

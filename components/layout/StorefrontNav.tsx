@@ -63,7 +63,7 @@ export function StorefrontNav() {
                 type="button"
                 aria-label="View cart"
                 onClick={() => setCartOpen(true)}
-                className="relative flex size-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted"
+                className="relative flex size-10 items-center justify-center rounded-full text-foreground transition-colors bg-foreground/5 hover:bg-foreground/10"
               >
                 <BasketIcon size={22} />
                 {count > 0 && (
@@ -84,7 +84,7 @@ export function StorefrontNav() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Chat on WhatsApp"
-                  className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-muted"
+                  className="flex size-10 items-center justify-center rounded-full transition-colors border bg-foreground/5 hover:bg-foreground/10"
                 >
                   {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
                   <WhatsappLogoIcon className="text-whatsapp" size={22} weight="fill" />
