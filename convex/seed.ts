@@ -7,6 +7,7 @@ const CATEGORIES = [
   { name: "Clothes", slug: "clothes", order: 0, description: "Everyday and occasion wear, tailored to fit." },
   { name: "Shoes", slug: "shoes", order: 1, description: "Leather, suede, and canvas — built to last." },
   { name: "Repairs", slug: "repairs", order: 2, description: "Give what you already own a second life." },
+  { name: "Accessories", slug: "accessories", order: 3, description: "The finishing details — belts, bags, and more." },
 ] as const
 
 const ITEMS: Array<{
@@ -147,6 +148,37 @@ const MORE_ITEMS: typeof ITEMS = [
   },
 ]
 
+const ACCESSORIES_ITEMS: typeof ITEMS = [
+  {
+    name: "Leather Belt",
+    description: "Full-grain leather belt with a brushed brass buckle.",
+    price: 14000,
+    categorySlug: "accessories",
+    inStock: true,
+  },
+  {
+    name: "Ankara Tote Bag",
+    description: "Structured tote in bold Ankara print with leather handles.",
+    price: 26000,
+    categorySlug: "accessories",
+    inStock: true,
+  },
+  {
+    name: "Beaded Bracelet Set",
+    description: "Hand-strung recycled glass beads, set of three.",
+    price: 9000,
+    categorySlug: "accessories",
+    inStock: true,
+  },
+  {
+    name: "Kente Bow Tie",
+    description: "Silk-lined bow tie in a compact kente weave.",
+    price: 8000,
+    categorySlug: "accessories",
+    inStock: false,
+  },
+]
+
 // Dev-only fixture data — refuses to run if the catalogue isn't empty, so it
 // can never clobber real categories/items added later via the admin console.
 export const seedStorefront = internalMutation({
@@ -238,6 +270,50 @@ export const addMoreItems = internalMutation({
         description: item.description,
         price: item.price,
         categoryId: categoryIds[item.categorySlug],
+        inStock: item.inStock,
+        isVisible: true,
+        createdBy: seedUser._id,
+        createdAt: now,
+        updatedAt: now,
+      })
+    }
+  },
+})
+
+// Dev-only — additive: adds the Accessories category (with its own items)
+// on top of an already-seeded catalogue. Safe to re-run.
+export const addAccessoriesCategory = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const seedUser = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", SEED_USER_EMAIL))
+      .unique()
+    if (seedUser === null) {
+      throw new Error("Run seedStorefront first — no seed user found.")
+    }
+
+    let category = await ctx.db
+      .query("categories")
+      .withIndex("by_slug", (q) => q.eq("slug", "accessories"))
+      .unique()
+
+    if (category === null) {
+      const seedCategory = CATEGORIES.find((c) => c.slug === "accessories")!
+      const categoryId = await ctx.db.insert("categories", seedCategory)
+      category = await ctx.db.get(categoryId)
+    }
+
+    const existingNames = new Set((await ctx.db.query("items").collect()).map((item) => item.name))
+
+    const now = Date.now()
+    for (const item of ACCESSORIES_ITEMS) {
+      if (existingNames.has(item.name)) continue
+      await ctx.db.insert("items", {
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        categoryId: category!._id,
         inStock: item.inStock,
         isVisible: true,
         createdBy: seedUser._id,
