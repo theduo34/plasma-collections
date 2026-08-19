@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -34,8 +35,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
           <ConvexClientProvider>
-            {children}
-            <Toaster theme="light" position="top-center" />
+            <TooltipProvider delayDuration={200}>
+              {children}
+              <Toaster theme="light" position="top-center" />
+            </TooltipProvider>
           </ConvexClientProvider>
         </body>
       </html>
