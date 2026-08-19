@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import Link from "next/link"
-import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react"
+import { ArrowLeftIcon, ArrowRightIcon, CaretRightIcon } from "@phosphor-icons/react"
 import { CatalogueItemCard } from "@/features/catalogue/components/CatalogueItemCard"
 import type { PublicCategory, PublicItem } from "@/features/catalogue/types/item"
 
@@ -31,7 +31,7 @@ export function CatalogueCategoryRow({
           className="group flex items-center gap-1.5 text-lg font-medium tracking-wide text-foreground uppercase"
         >
           {category.name}
-          <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-1" />
+          <CaretRightIcon size={16} className="transition-transform group-hover:translate-x-1" />
         </Link>
         <div className="hidden items-center gap-2 sm:flex">
           <button

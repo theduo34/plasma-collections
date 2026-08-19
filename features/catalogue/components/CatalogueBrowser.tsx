@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { usePublicItems } from "@/features/catalogue/hooks/usePublicItems"
 import { usePublicCategories } from "@/features/catalogue/hooks/usePublicCategories"
-import { CategoryFilter } from "@/features/catalogue/components/CategoryFilter"
+import { CatalogueSearchBar } from "@/features/catalogue/components/CatalogueSearchBar"
 import { CatalogueCategoryRow } from "@/features/catalogue/components/CatalogueCategoryRow"
 import { CatalogueItemCard } from "@/features/catalogue/components/CatalogueItemCard"
 import { EmptyState } from "@/components/shared/EmptyState"
@@ -34,29 +34,48 @@ export function CatalogueBrowser() {
 
   if (items === undefined || categories === undefined) {
     return (
-      <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-        {Array.from({ length: 8 }).map((_, index) => (
-          <Skeleton key={index} className="aspect-square rounded-lg" />
-        ))}
+      <div className="container-page pt-6 pb-14">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <Skeleton key={index} className="aspect-square rounded-lg" />
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col">
       {categories.length > 0 && (
-        <CategoryFilter
+        <CatalogueSearchBar
           categories={categories}
           selected={selectedCategory?._id ?? null}
           onSelect={handleSelect}
         />
       )}
 
-      {selectedCategory ? (
-        filteredItems && filteredItems.length > 0 ? (
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-            {filteredItems.map((item) => (
-              <CatalogueItemCard key={item._id} item={item} />
+      <div className="container-page flex flex-col gap-10 pt-6 pb-14">
+        {selectedCategory ? (
+          filteredItems && filteredItems.length > 0 ? (
+            <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+              {filteredItems.map((item) => (
+                <CatalogueItemCard key={item._id} item={item} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No items here yet"
+              description="Check back soon, or browse another category."
+            />
+          )
+        ) : items.length > 0 ? (
+          <div className="flex flex-col gap-12">
+            {categories.map((category) => (
+              <CatalogueCategoryRow
+                key={category._id}
+                category={category}
+                items={items.filter((item) => item.categoryId === category._id)}
+              />
             ))}
           </div>
         ) : (
@@ -64,23 +83,8 @@ export function CatalogueBrowser() {
             title="No items here yet"
             description="Check back soon, or browse another category."
           />
-        )
-      ) : items.length > 0 ? (
-        <div className="flex flex-col gap-12">
-          {categories.map((category) => (
-            <CatalogueCategoryRow
-              key={category._id}
-              category={category}
-              items={items.filter((item) => item.categoryId === category._id)}
-            />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          title="No items here yet"
-          description="Check back soon, or browse another category."
-        />
-      )}
+        )}
+      </div>
     </div>
   )
 }
