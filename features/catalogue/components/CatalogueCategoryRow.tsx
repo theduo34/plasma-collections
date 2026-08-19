@@ -2,12 +2,13 @@
 
 import { useRef } from "react"
 import Link from "next/link"
-import { ArrowLeftIcon, ArrowRightIcon, CaretRightIcon } from "@phosphor-icons/react"
+import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react"
 import { CatalogueItemCard } from "@/features/catalogue/components/CatalogueItemCard"
 import type { PublicCategory, PublicItem } from "@/features/catalogue/types/item"
 
 // Airbnb-style browse row: title + "view all", a horizontally scrollable
-// strip of cards, and left/right nav buttons that scroll it programmatically.
+// strip of cards (2 visible on mobile, 5 on large screens), and left/right
+// nav buttons that page through it by one screen's worth at a time.
 export function CatalogueCategoryRow({
   category,
   items,
@@ -17,38 +18,45 @@ export function CatalogueCategoryRow({
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  function scrollBy(amount: number) {
-    scrollRef.current?.scrollBy({ left: amount, behavior: "smooth" })
+  function scrollByPage(direction: 1 | -1) {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollBy({ left: direction * el.clientWidth, behavior: "smooth" })
   }
 
   if (items.length === 0) return null
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Link
-          href={`/catalogue?category=${category.slug}`}
-          className="group flex items-center gap-1.5 text-lg font-medium tracking-wide text-foreground uppercase"
-        >
-          {category.name}
-          <CaretRightIcon size={16} className="transition-transform group-hover:translate-x-1" />
-        </Link>
-        <div className="hidden items-center gap-2 sm:flex">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <Link
+            href={`/catalogue?category=${category.slug}`}
+            className="group flex items-center gap-1.5 text-lg font-medium tracking-wide text-foreground uppercase"
+          >
+            {category.name}
+            <CaretRightIcon size={16} className="transition-transform group-hover:translate-x-1" />
+          </Link>
+          {category.description && (
+            <p className="text-sm text-muted-foreground">{category.description}</p>
+          )}
+        </div>
+        <div className="hidden shrink-0 items-center gap-2 sm:flex">
           <button
             type="button"
             aria-label="Scroll left"
-            onClick={() => scrollBy(-320)}
+            onClick={() => scrollByPage(-1)}
             className="flex size-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary hover:bg-muted"
           >
-            <ArrowLeftIcon size={14} />
+            <CaretLeftIcon size={14} />
           </button>
           <button
             type="button"
             aria-label="Scroll right"
-            onClick={() => scrollBy(320)}
+            onClick={() => scrollByPage(1)}
             className="flex size-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary hover:bg-muted"
           >
-            <ArrowRightIcon size={14} />
+            <CaretRightIcon size={14} />
           </button>
         </div>
       </div>
@@ -58,7 +66,10 @@ export function CatalogueCategoryRow({
         className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((item) => (
-          <div key={item._id} className="w-40 shrink-0 sm:w-52">
+          <div
+            key={item._id}
+            className="w-[calc((100%-1rem)/2)] shrink-0 sm:w-[calc((100%-2rem)/3)] lg:w-[calc((100%-4rem)/5)]"
+          >
             <CatalogueItemCard item={item} />
           </div>
         ))}
