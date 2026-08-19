@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ShoppingBagIcon, WhatsappLogoIcon } from "@phosphor-icons/react"
+import { BasketIcon, WhatsappLogoIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { useOrderCart } from "@/features/order/hooks/useOrderCart"
 import { OrderSummarySheet } from "@/features/order/components/OrderSummarySheet"
@@ -60,7 +60,7 @@ export function StorefrontNav() {
             onClick={() => setCartOpen(true)}
             className="relative flex size-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
           >
-            <ShoppingBagIcon size={22} />
+            <BasketIcon size={22} />
             {count > 0 && (
               <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
                 {count}
@@ -73,7 +73,7 @@ export function StorefrontNav() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
-              className="flex size-10 items-center justify-center rounded-md bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex size-10 items-center justify-center rounded-md transition-colors hover:bg-muted"
             >
               {/* WhatsApp's own mark, in its own green — a third-party brand icon we never recolor. */}
               <WhatsappLogoIcon className="text-whatsapp" size={22} weight="fill" />
