@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-import { ArrowLeftIcon, BasketIcon, ImageIcon } from "@phosphor-icons/react"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Badge } from "@/components/ui/badge"
+import { ArrowLeftIcon, BasketIcon } from "@phosphor-icons/react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { ItemImageCarousel } from "@/features/catalogue/components/ItemImageCarousel"
+import { ItemStatusBadges } from "@/features/catalogue/components/ItemStatusBadges"
 import { QuantityStepper } from "@/features/order/components/QuantityStepper"
 import { useOrderCart } from "@/features/order/hooks/useOrderCart"
 import { usePublicItem } from "@/features/catalogue/hooks/usePublicItem"
@@ -58,27 +57,9 @@ export function ItemDetailPage({ itemId }: { itemId: Id<"items"> }) {
       </Link>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-md border border-border bg-muted">
-          <AspectRatio ratio={1} className="relative">
-            {item.imageUrl ? (
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <ImageIcon className="text-muted-foreground/40" size={64} />
-              </div>
-            )}
-            {!item.inStock && (
-              <Badge variant="secondary" className="absolute top-3 left-3">
-                Sold out
-              </Badge>
-            )}
-          </AspectRatio>
+        <div className="relative overflow-hidden rounded-md border border-border bg-muted">
+          <ItemImageCarousel images={item.imageUrls} alt={item.name} />
+          <ItemStatusBadges item={item} />
         </div>
 
         <div className="flex flex-col gap-6">
