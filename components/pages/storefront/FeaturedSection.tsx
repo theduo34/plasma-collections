@@ -7,7 +7,7 @@ export function FeaturedSection() {
     <section>
       <div className="container-page section-y">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-sm font-medium tracking-widest text-foreground uppercase">
+          <h2 className="text-2xl font-medium tracking-widest text-foreground uppercase">
             New In
           </h2>
           <Link
