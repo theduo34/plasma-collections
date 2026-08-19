@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import { ImageIcon } from "@phosphor-icons/react/dist/ssr"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Badge } from "@/components/ui/badge"
@@ -6,7 +7,7 @@ import type { PublicItem } from "@/features/catalogue/types/item"
 
 export function ItemCard({ item }: { item: PublicItem }) {
   return (
-    <div className="group flex flex-col">
+    <Link href={`/item/${item._id}`} className="group flex flex-col">
       <AspectRatio ratio={1} className="relative bg-muted">
         {item.imageUrl ? (
           <Image
@@ -14,7 +15,7 @@ export function ItemCard({ item }: { item: PublicItem }) {
             alt={item.name}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover"
+            className="object-cover transition-opacity group-hover:opacity-90"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
@@ -33,6 +34,6 @@ export function ItemCard({ item }: { item: PublicItem }) {
           GH₵ {(item.price / 100).toFixed(2)}
         </p>
       </div>
-    </div>
+    </Link>
   )
 }
