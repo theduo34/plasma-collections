@@ -156,8 +156,10 @@
 
 /* Reusable layout utilities — define spacing once here, use as a
    className everywhere instead of repeating mx-auto/max-w/px/py per page. */
+/* Tailwind's max-w scale tops out at 7xl (80rem) — there's no built-in 8xl,
+   so the wider container width is set directly here instead. */
 @utility container-page {
-  @apply mx-auto w-full max-w-7xl px-4;
+  @apply mx-auto w-full max-w-[90rem] px-4;
 }
 
 @utility section-y {
