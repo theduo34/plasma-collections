@@ -25,7 +25,7 @@ export function Topbar({
   )
 
   return (
-    <header className="flex h-16 items-center gap-3 border-b border-border bg-card px-4 lg:px-6">
+    <header className="flex h-16 items-center gap-3 border-b border-sidebar-border bg-sidebar px-4 lg:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -46,7 +46,7 @@ export function Topbar({
         <SidebarSimpleIcon size={20} />
       </Button>
 
-      <span className="font-sans text-sm font-semibold uppercase tracking-wide text-foreground">
+      <span className="font-sans text-sm font-semibold uppercase tracking-wide text-sidebar-foreground">
         {activeItem?.label}
       </span>
 

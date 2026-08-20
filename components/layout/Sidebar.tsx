@@ -37,7 +37,7 @@ export function Sidebar({
     >
       <div
         className={cn(
-          "flex items-center gap-3 border-b border-sidebar-border px-5 py-5",
+          "flex h-16 items-center gap-3 border-b border-sidebar-border px-5",
           collapsed && "justify-center px-3"
         )}
       >
@@ -58,10 +58,10 @@ export function Sidebar({
             const href = `/admin/${token}/${item.segment}`
             const isActive = pathname === href || pathname.startsWith(`${href}/`)
             const linkClassName = cn(
-              "flex items-center gap-3 rounded-md px-3 py-2.5 text-base font-bold transition-colors",
+              "flex items-center gap-3 rounded-md px-3 py-2.5 text-base font-semibold transition-colors",
               collapsed && "justify-center px-0",
               isActive
-                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             )
 
@@ -70,7 +70,7 @@ export function Sidebar({
                 <Tooltip key={item.segment}>
                   <TooltipTrigger asChild>
                     <Link href={href} onClick={onNavigate} className={linkClassName}>
-                      <item.icon size={22} weight="bold" />
+                      <item.icon size={22} />
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent side="right">{item.label}</TooltipContent>
@@ -80,7 +80,7 @@ export function Sidebar({
 
             return (
               <Link key={item.segment} href={href} onClick={onNavigate} className={linkClassName}>
-                <item.icon size={22} weight="bold" />
+                <item.icon size={22} />
                 {item.label}
               </Link>
             )
@@ -88,7 +88,7 @@ export function Sidebar({
         )}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
+      <div className="flex h-16 items-center border-t border-sidebar-border px-3">
         <AccountMenu collapsed={collapsed} />
       </div>
     </aside>

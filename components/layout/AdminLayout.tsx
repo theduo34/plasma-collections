@@ -11,7 +11,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <Sidebar collapsed={collapsed} className="hidden lg:flex" />
       <div className="flex flex-1 flex-col">
         <Topbar collapsed={collapsed} onToggleCollapse={() => setCollapsed((value) => !value)} />
-        <main className="flex-1 bg-muted/30 p-6">{children}</main>
+        <main className="flex-1 bg-background p-6">{children}</main>
       </div>
     </div>
   )
