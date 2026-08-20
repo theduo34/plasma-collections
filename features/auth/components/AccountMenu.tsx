@@ -137,7 +137,7 @@ export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
             }}
           >
             {isDark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-            {isDark ? "Switch to light mode" : "Switch to dark mode"}
+            {isDark ? "Light theme" : "Dark theme"}
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
