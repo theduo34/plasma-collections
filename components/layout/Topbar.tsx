@@ -3,10 +3,10 @@ import { useState } from "react"
 import { usePathname, useParams } from "next/navigation"
 import { ListIcon, SidebarSimpleIcon, BellIcon } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { ThemeToggle } from "@/components/layout/ThemeToggle"
 import { ADMIN_NAV_ITEMS } from "@/components/layout/admin-nav-items"
 
 export function Topbar({
@@ -17,6 +17,7 @@ export function Topbar({
   onToggleCollapse: () => void
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const pathname = usePathname()
   const { token } = useParams<{ token: string }>()
 
@@ -50,21 +51,31 @@ export function Topbar({
         {activeItem?.label}
       </span>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Notifications" className="ml-auto">
-            <BellIcon size={20} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-72">
-          <EmptyState title="No notifications yet" description="You're all caught up." className="py-6" />
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="ml-auto flex items-center gap-1">
+        <ThemeToggle />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Notifications"
+          onClick={() => setNotificationsOpen(true)}
+        >
+          <BellIcon size={20} />
+        </Button>
+      </div>
 
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
         <SheetContent side="left" className="w-64 border-r-0 p-0">
           <SheetTitle className="sr-only">Admin navigation</SheetTitle>
           <Sidebar onNavigate={() => setMobileNavOpen(false)} />
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+        <SheetContent side="right">
+          <SheetHeader>
+            <SheetTitle>Notifications</SheetTitle>
+          </SheetHeader>
+          <EmptyState title="No notifications yet" description="You're all caught up." className="flex-1" />
         </SheetContent>
       </Sheet>
     </header>

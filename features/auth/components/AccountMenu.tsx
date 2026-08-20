@@ -1,4 +1,5 @@
 'use client'
+import { useState } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useMutation } from "convex/react"
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar } from "@/components/shared/Avatar"
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { usePermission } from "@/features/auth/hooks/usePermission"
 import { adminSessionCache } from "@/features/auth/utils/adminSessionCache"
@@ -40,6 +42,7 @@ export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
   const { signOut } = useAuthActions()
   const revokeSessionToken = useMutation(api.sessionTokens.revoke)
   const router = useRouter()
+  const [confirmSignOutOpen, setConfirmSignOutOpen] = useState(false)
 
   async function handleSignOut() {
     // Revoke first — the /admin/<token> URL dies immediately instead of
@@ -64,46 +67,65 @@ export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(
-          "flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-sidebar-accent",
-          collapsed && "justify-center"
-        )}
-      >
-        <Avatar initials={initialsFor(user.name)} />
-        {!collapsed && (
-          <>
-            <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm font-medium text-sidebar-foreground">{user.name}</span>
-              <span className="truncate text-xs text-muted-foreground">
-                {user.role === "super-admin" ? "Super Admin" : "Admin"}
-              </span>
-            </div>
-            <CaretUpDownIcon size={16} className="shrink-0 text-muted-foreground" />
-          </>
-        )}
-      </DropdownMenuTrigger>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn(
+            "flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-sidebar-accent",
+            collapsed && "justify-center"
+          )}
+        >
+          <Avatar initials={initialsFor(user.name)} />
+          {!collapsed && (
+            <>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium text-sidebar-foreground">{user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {user.role === "super-admin" ? "Super Admin" : "Admin"}
+                </span>
+              </div>
+              <CaretUpDownIcon size={16} className="shrink-0 text-muted-foreground" />
+            </>
+          )}
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" side={collapsed ? "right" : "top"} className="w-64">
-        <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
-          <span className="text-sm font-medium text-foreground">{user.name}</span>
-          <span className="truncate text-xs font-normal text-muted-foreground">{user.email}</span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {canConfigureSettings && (
-          <DropdownMenuItem asChild>
-            <Link href={`/admin/${token}/settings`}>
-              <GearSixIcon />
-              Settings
-            </Link>
+        <DropdownMenuContent align="end" side={collapsed ? "right" : "top"} className="w-72">
+          <DropdownMenuLabel className="flex flex-col gap-1 px-3 py-3">
+            <span className="text-base font-semibold text-foreground">{user.name}</span>
+            <span className="truncate text-sm font-normal text-muted-foreground">{user.email}</span>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {canConfigureSettings && (
+            <DropdownMenuItem asChild className="gap-3 px-3 py-3 text-sm">
+              <Link href={`/admin/${token}/settings`}>
+                <GearSixIcon size={18} />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            variant="destructive"
+            className="gap-3 px-3 py-3 text-sm"
+            onSelect={(event) => {
+              event.preventDefault()
+              setConfirmSignOutOpen(true)
+            }}
+          >
+            <SignOutIcon size={18} />
+            Sign out
           </DropdownMenuItem>
-        )}
-        <DropdownMenuItem variant="destructive" onSelect={handleSignOut}>
-          <SignOutIcon />
-          Sign out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <ConfirmDialog
+        open={confirmSignOutOpen}
+        onOpenChange={setConfirmSignOutOpen}
+        title="Sign out?"
+        description="You'll need to log in again to get back into the admin console."
+        confirmLabel="Sign out"
+        variant="destructive"
+        onConfirm={handleSignOut}
+      />
+    </>
   )
 }

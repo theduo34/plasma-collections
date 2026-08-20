@@ -48,6 +48,7 @@ There is no checkout flow, no cart persistence, and no payment integration in th
 | Icons | `@phosphor-icons/react` |
 | Fonts | Geist Sans · Geist Mono · JetBrains Mono (body defaults to monospace) |
 | Toasts | sonner |
+| Theme | `next-themes` — manual light/dark toggle, no system-preference following |
 
 Path alias: `@/` maps to the project root. Always use `@/components/...`, `@/lib/...`, `@/hooks/...`, `@/convex/...`, etc.
 
@@ -221,7 +222,8 @@ the-drop/
 ├── components/
 │   ├── layout/
 │   │   ├── Sidebar.tsx                   # Persistent on lg+ (collapsible to an icon rail), Sheet on mobile
-│   │   ├── Topbar.tsx                    # Mobile nav toggle, desktop collapse toggle, section label, notification bell
+│   │   ├── Topbar.tsx                    # Mobile nav toggle, desktop collapse toggle, section label, theme toggle, notification panel
+│   │   ├── ThemeToggle.tsx               # Light/dark switch — next-themes, admin header only
 │   │   ├── admin-nav-items.ts            # Nav config shared by Sidebar + Topbar (label, icon, permission)
 │   │   ├── StorefrontNav.tsx             # Public navbar with logo + WhatsApp CTA
 │   │   ├── StorefrontFooter.tsx
@@ -233,7 +235,8 @@ the-drop/
 │   │   ├── EmptyState.tsx
 │   │   ├── LoadingSpinner.tsx
 │   │   ├── PageHeader.tsx
-│   │   ├── ConfirmDialog.tsx
+│   │   ├── ConfirmDialog.tsx             # Controlled AlertDialog wrapper — confirm before a destructive action
+│   │   ├── ThemedToaster.tsx             # sonner Toaster synced to the current light/dark theme
 │   │   └── DataTable.tsx
 │   ├── builders/
 │   │   ├── FormField.tsx
@@ -313,7 +316,8 @@ the-drop/
 │
 ├── hooks/                                # Global/shared hooks
 ├── providers/
-│   └── ConvexClientProvider.tsx
+│   ├── ConvexClientProvider.tsx
+│   └── ThemeProvider.tsx                 # next-themes, attribute="class", no system-preference following
 ├── lib/
 │   ├── utils.ts                          # cn() and shared utilities
 │   ├── permissions.ts                    # RBAC — roles, permissions, can()
@@ -725,6 +729,9 @@ When in doubt, apply these in order:
 32. `Sidebar`/nav-rail surfaces use the `--sidebar-*` token family (`bg-sidebar` + `text-sidebar-foreground`, `bg-sidebar-accent` + `text-sidebar-accent-foreground` for both hover and the active nav item) — already defined for both light and dark themes in `app/globals.css`. `Topbar` shares the same `bg-sidebar`/`border-sidebar-border` so the header and sidebar read as one chrome surface, distinct from `bg-background` on `<main>`. Don't hardcode a sidebar color or force `className="dark"` on it. The active nav item is never `bg-sidebar-primary`/gold — primary is reserved for real emphasis (buttons, chart/data values), not a persistent nav highlight; see "Gold is for emphasis, not decoration" above.
 33. A new top-level admin nav destination goes in `components/layout/admin-nav-items.ts` (one array, read by both `Sidebar` and `Topbar`) — never add a link directly inside `Sidebar.tsx` or duplicate the list in `Topbar.tsx`.
 34. Anything sensitive persisted to `localStorage` goes through `localStorageHelper` (`lib/local-storage.ts`), never a raw `window.localStorage.setItem`/`getItem` call — see "Client-Side Local Storage" above. It is encryption-at-rest for casual inspection, not an auth boundary: never branch an access-control or redirect decision on a value it returns.
+35. A menu-triggered panel of content (notifications, filters, anything more than a couple of short actions) is a `Sheet`, not a `DropdownMenu` — `DropdownMenu` stays for short action lists (the account menu's Settings/Sign out). Both patterns already exist side by side in `Topbar.tsx`, don't collapse them into one.
+36. Sign-out, and any future destructive/hard-to-undo admin action (delete item, deactivate a user, etc.), goes through `components/shared/ConfirmDialog.tsx` (a controlled `AlertDialog` wrapper) instead of firing immediately from the triggering click/menu-item. When triggering it from a `DropdownMenuItem`, call `event.preventDefault()` in `onSelect` before opening it — otherwise the menu's own close behavior fights the dialog's focus handling.
+37. The light/dark toggle (`components/layout/ThemeToggle.tsx`, `next-themes`) is global — it sets `.dark` on `<html>`, so it affects the whole site, not just the admin console, even though the toggle button itself only appears in the admin `Topbar`. This is intentional (the app already ships full light/dark tokens for every surface, storefront included), not a bug — don't add a second, separately-scoped theme system for the storefront.
 
 <!-- convex-ai-start -->
 
