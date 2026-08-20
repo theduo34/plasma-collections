@@ -63,7 +63,7 @@ export const createSuperAdmin = internalAction({
 export const listUsers = query({
   args: {},
   handler: async (ctx) => {
-    await requireRole(ctx, ["admin", "super-admin"])
+    await requireRole(ctx, ["super-admin"])
     throw new Error("Not implemented")
   },
 })
