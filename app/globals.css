@@ -183,3 +183,24 @@
     @apply font-mono;
   }
 }
+
+/* Light/dark toggle transition — a circular reveal from the click point.
+   Driven by AccountMenu via document.startViewTransition(); the
+   --theme-toggle-x/y custom properties are set right before it's called.
+   Browsers without View Transitions just swap themes instantly. */
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+}
+
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-new(root) {
+  animation: theme-reveal 500ms ease-in-out;
+}
