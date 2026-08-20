@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { api } from "@/convex/_generated/api"
+import { adminSessionCache } from "@/features/auth/utils/adminSessionCache"
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -43,6 +44,7 @@ export function LoginForm() {
       await signIn("password", { ...values, flow: "signIn" })
       // A fresh admin URL every login — see convex/sessionTokens.ts.
       const token = await issueSessionToken({})
+      await adminSessionCache.save(token)
       router.push(`/admin/${token}/dashboard`)
     } catch {
       toast.error("Invalid email or password.")

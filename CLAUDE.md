@@ -270,8 +270,10 @@ the-drop/
 │   │   ├── hooks/
 │   │   │   ├── useAuth.ts
 │   │   │   └── usePermission.ts
-│   │   └── guards/
-│   │       └── RoleGuard.tsx
+│   │   ├── guards/
+│   │   │   └── RoleGuard.tsx
+│   │   └── utils/
+│   │       └── adminSessionCache.ts      # Tracks the session token in localStorage — never an auth check
 │   ├── catalogue/
 │   │   ├── components/
 │   │   │   ├── ItemCard.tsx              # Product card used on storefront
@@ -315,7 +317,8 @@ the-drop/
 ├── lib/
 │   ├── utils.ts                          # cn() and shared utilities
 │   ├── permissions.ts                    # RBAC — roles, permissions, can()
-│   └── admin-login-path.ts               # resolves /<ADMIN_LOGIN_TOKEN>/login — server-only
+│   ├── admin-login-path.ts               # resolves /<ADMIN_LOGIN_TOKEN>/login — server-only
+│   └── local-storage.ts                  # localStorageHelper — AES-GCM–encrypted localStorage, see below
 ├── types/
 └── proxy.ts                              # Next.js 16 — do not rename to middleware.ts
 ```
@@ -591,6 +594,17 @@ Don't hardcode an `/admin/...` path anywhere in the UI — every internal admin 
 
 ---
 
+## Client-Side Local Storage — `lib/local-storage.ts`
+
+`localStorageHelper` (`set`, `get`, `has`, `remove`, `removeAll`) is an AES-GCM–encrypted wrapper around `window.localStorage`, keyed from `NEXT_PUBLIC_LOCAL_STORAGE_SALT` (PBKDF2-derived). All values live under a `pc:` prefix so `removeAll()` only ever clears what this helper wrote — it never touches unrelated storage like the storefront cart (`features/order/components/OrderCartProvider.tsx`, which is plain, unencrypted `localStorage` and should stay that way — cart contents aren't sensitive, and rewriting a working feature onto an async encrypted store isn't worth the risk).
+
+**What this does and doesn't buy you:**
+- It IS real AES-GCM encryption — a tampered or wrong-key payload fails to decrypt (`get` returns `null` and drops the corrupt entry) rather than silently returning garbage.
+- The key necessarily ships in the browser bundle — anything that decrypts client-side needs its key client-side, there's no way around that on the web. So this stops a casual look at devtools → Application → Local Storage, or a script grepping localStorage for recognizable plaintext. It does **not** stop a determined attacker who reads the site's own JavaScript.
+- **Never use a value read back from here to make an access-control or redirect decision.** The one current consumer, `features/auth/utils/adminSessionCache.ts`, tracks the admin's session token client-side purely for visibility — it is not read anywhere to decide "is this user logged in." That decision is made server-side, on every request, by `proxy.ts` (checks the real Convex Auth session) and `convex/sessionTokens.ts`'s `current()`/`touch()` (re-check the database row). A forged or stale cache entry can't bypass that — at worst it points at a URL that `app/(admin)/admin/[token]/layout.tsx` immediately rejects and bounces home, identical to having no session at all. If you're tempted to read `adminSessionCache` to skip the login form or gate a route, don't — that logic already exists, server-side, and is the actual security boundary.
+
+---
+
 ## Import Convention & Data Flow
 
 ```
@@ -631,6 +645,7 @@ AUTH_SECRET=                      # Convex Auth session signing secret — serve
 ADMIN_LOGIN_TOKEN=                # UUID; login page lives at /<this>/login — server-only, never NEXT_PUBLIC_
 NEXT_PUBLIC_WA_NUMBER=            # WhatsApp business number with country code, no + (e.g. 233XXXXXXXXX)
 NEXT_PUBLIC_APP_URL=              # e.g. http://localhost:3000
+NEXT_PUBLIC_LOCAL_STORAGE_SALT=   # localStorageHelper's AES-GCM passphrase — see "Client-Side Local Storage" below
 RESEND_API_KEY=                   # only if transactional email is added later
 ```
 
@@ -709,6 +724,7 @@ When in doubt, apply these in order:
 31. Every admin route is nested under `/admin/[token]/...` — never add an admin page at a fixed path like `/dashboard` or `/admin/settings` directly. The `[token]` is the per-login secret from `convex/sessionTokens.ts` (see "Admin Session Tokens" above); a new admin route goes under `app/(admin)/admin/[token]/`, and any link to it is built from the current token via `useParams()`/`params`, never hardcoded.
 32. `Sidebar`/nav-rail surfaces use the `--sidebar-*` token family (`bg-sidebar`, `text-sidebar-foreground`, `bg-sidebar-primary` + `text-sidebar-primary-foreground` for the active nav item, `bg-sidebar-accent` + `text-sidebar-accent-foreground` for hover) — already defined for both light and dark themes in `app/globals.css`. Don't hardcode a sidebar color or force `className="dark"` on it; the tokens already give it a distinct surface in both themes.
 33. A new top-level admin nav destination goes in `components/layout/admin-nav-items.ts` (one array, read by both `Sidebar` and `Topbar`) — never add a link directly inside `Sidebar.tsx` or duplicate the list in `Topbar.tsx`.
+34. Anything sensitive persisted to `localStorage` goes through `localStorageHelper` (`lib/local-storage.ts`), never a raw `window.localStorage.setItem`/`getItem` call — see "Client-Side Local Storage" above. It is encryption-at-rest for casual inspection, not an auth boundary: never branch an access-control or redirect decision on a value it returns.
 
 <!-- convex-ai-start -->
 

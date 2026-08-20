@@ -15,6 +15,7 @@ import {
 import { Avatar } from "@/components/shared/Avatar"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { usePermission } from "@/features/auth/hooks/usePermission"
+import { adminSessionCache } from "@/features/auth/utils/adminSessionCache"
 import { api } from "@/convex/_generated/api"
 
 function initialsFor(name: string) {
@@ -43,6 +44,7 @@ export function AccountMenu() {
     // Revoke first — the /admin/<token> URL dies immediately instead of
     // waiting out the 24h idle window. See convex/sessionTokens.ts.
     await revokeSessionToken({}).catch(() => {})
+    adminSessionCache.clear()
     await signOut()
     router.push("/")
   }
