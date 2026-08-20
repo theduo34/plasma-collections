@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { Sidebar } from "@/components/layout/Sidebar"
-import { ThemeToggle } from "@/components/layout/ThemeToggle"
 import { ADMIN_NAV_ITEMS } from "@/components/layout/admin-nav-items"
 
 export function Topbar({
@@ -51,17 +50,15 @@ export function Topbar({
         {activeItem?.label}
       </span>
 
-      <div className="ml-auto flex items-center gap-1">
-        <ThemeToggle />
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Notifications"
-          onClick={() => setNotificationsOpen(true)}
-        >
-          <BellIcon size={20} />
-        </Button>
-      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Notifications"
+        className="ml-auto"
+        onClick={() => setNotificationsOpen(true)}
+      >
+        <BellIcon size={20} />
+      </Button>
 
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
         <SheetContent side="left" className="w-64 border-r-0 p-0">
