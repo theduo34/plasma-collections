@@ -220,8 +220,9 @@ the-drop/
 │
 ├── components/
 │   ├── layout/
-│   │   ├── Sidebar.tsx
-│   │   ├── Topbar.tsx
+│   │   ├── Sidebar.tsx                   # Persistent on lg+, opens in a Sheet on mobile (via Topbar)
+│   │   ├── Topbar.tsx                    # Mobile nav toggle + active-section label
+│   │   ├── admin-nav-items.ts            # Nav config shared by Sidebar + Topbar (label, icon, permission)
 │   │   ├── StorefrontNav.tsx             # Public navbar with logo + WhatsApp CTA
 │   │   ├── StorefrontFooter.tsx
 │   │   ├── AuthLayout.tsx
@@ -265,7 +266,7 @@ the-drop/
 │   ├── auth/
 │   │   ├── components/
 │   │   │   ├── LoginForm.tsx             # No RegisterForm — it doesn't exist
-│   │   │   └── SignOutButton.tsx         # Revokes the session token, then Convex Auth signOut()
+│   │   │   └── AccountMenu.tsx           # Sidebar-bottom popover: profile, Settings (super-admin), sign out
 │   │   ├── hooks/
 │   │   │   ├── useAuth.ts
 │   │   │   └── usePermission.ts
@@ -583,7 +584,7 @@ Rules, enforced in `convex/sessionTokens.ts` (the real boundary — see "No Row 
 - **Issued at login, never reused.** `LoginForm` calls `sessionTokens.issue` right after `signIn()` succeeds, which deletes any token the user already held and mints a new `crypto.randomUUID()`. Logging in always produces a brand-new URL — an old tab, an old bookmark, a link pasted somewhere it shouldn't have been, all stop working the moment a new login happens.
 - **One live token per user.** `issue` deletes the previous row for that `userId` before inserting — a user can't have two valid admin URLs at once.
 - **24-hour sliding idle window.** Each token row carries `lastActiveAt`. Every visit to an `/admin/[token]/...` route calls `sessionTokens.touch`, which checks `Date.now() - lastActiveAt <= 24h` and, if still valid, bumps `lastActiveAt` forward. Keep visiting at least once a day and the URL stays alive; go quiet for 24 hours and the next visit finds it expired (and deletes the row).
-- **Revoked immediately on sign-out.** `SignOutButton` calls `sessionTokens.revoke` before `signOut()` — closing the session kills the URL right away instead of waiting out the idle window.
+- **Revoked immediately on sign-out.** `AccountMenu` (the popover at the bottom of `Sidebar`) calls `sessionTokens.revoke` before `signOut()` — closing the session kills the URL right away instead of waiting out the idle window.
 - **Invalid token → redirect home, same as unauthenticated.** A mismatched, expired, or someone-else's token never gets a distinguishing error — it's treated exactly like "not logged in" (redirect to `/`), so a probe can't tell a stale token from a wrong one.
 
 Don't hardcode an `/admin/...` path anywhere in the UI — every internal admin link has to include the current token, read via `useParams<{ token: string }>()` in a client component under the `[token]` segment (or `params` in a Server Component).
@@ -706,6 +707,8 @@ When in doubt, apply these in order:
 29. The homepage structure (Option B, approved over an "editorial split" alternative) is: full-bleed dark `HeroSection` (`-mt-16` under the nav) → `StatementSection` (one big line, no card, no icons) → `CategoryHighlights` (edge-to-edge, no gaps, no borders, name overlaid on the block) → `FeaturedSection` (borderless product tiles) → `CtaSection` + `StorefrontFooter` (share the same `dark` scope, no seam between them, deliberately one continuous closing block). Don't reintroduce bordered/boxed sections or reflow this into a symmetric "stack of equal cards" — that's the pattern this replaced.
 30. Item/category photos go through `ctx.storage` exactly the same way whether they're a real admin upload or a dev placeholder — `convex/seedImages.ts` fills in anything missing an `imageStorageId` via a placeholder image service and `ctx.storage.store()`, the real storage pipeline, not a throwaway hack. Public queries resolve `imageStorageId` to a servable URL themselves (see `PublicItem`/`PublicCategory` in `features/catalogue/types/item.ts`) — components never call `ctx.storage.getUrl` or construct a storage URL themselves. Once every item/category has a real uploaded photo, `seedPlaceholderImages` simply finds nothing left to do — no cleanup step needed.
 31. Every admin route is nested under `/admin/[token]/...` — never add an admin page at a fixed path like `/dashboard` or `/admin/settings` directly. The `[token]` is the per-login secret from `convex/sessionTokens.ts` (see "Admin Session Tokens" above); a new admin route goes under `app/(admin)/admin/[token]/`, and any link to it is built from the current token via `useParams()`/`params`, never hardcoded.
+32. `Sidebar`/nav-rail surfaces use the `--sidebar-*` token family (`bg-sidebar`, `text-sidebar-foreground`, `bg-sidebar-primary` + `text-sidebar-primary-foreground` for the active nav item, `bg-sidebar-accent` + `text-sidebar-accent-foreground` for hover) — already defined for both light and dark themes in `app/globals.css`. Don't hardcode a sidebar color or force `className="dark"` on it; the tokens already give it a distinct surface in both themes.
+33. A new top-level admin nav destination goes in `components/layout/admin-nav-items.ts` (one array, read by both `Sidebar` and `Topbar`) — never add a link directly inside `Sidebar.tsx` or duplicate the list in `Topbar.tsx`.
 
 <!-- convex-ai-start -->
 
