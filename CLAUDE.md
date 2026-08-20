@@ -222,9 +222,8 @@ the-drop/
 ├── components/
 │   ├── layout/
 │   │   ├── Sidebar.tsx                   # Persistent on lg+ (collapsible to an icon rail), Sheet on mobile
-│   │   ├── Topbar.tsx                    # Mobile nav toggle, desktop collapse toggle, section label, theme toggle, notification panel
-│   │   ├── ThemeToggle.tsx               # Light/dark switch — next-themes, admin header only
-│   │   ├── admin-nav-items.ts            # Nav config shared by Sidebar + Topbar (label, icon, permission)
+│   │   ├── Topbar.tsx                    # Mobile nav toggle, desktop collapse toggle, section label, notification panel
+│   │   ├── admin-nav-items.ts            # Nav config shared by Sidebar + Topbar — Dashboard/Catalogue/Users only, no Settings
 │   │   ├── StorefrontNav.tsx             # Public navbar with logo + WhatsApp CTA
 │   │   ├── StorefrontFooter.tsx
 │   │   ├── AuthLayout.tsx
@@ -269,7 +268,7 @@ the-drop/
 │   ├── auth/
 │   │   ├── components/
 │   │   │   ├── LoginForm.tsx             # No RegisterForm — it doesn't exist
-│   │   │   └── AccountMenu.tsx           # Sidebar-bottom popover: profile, Settings (super-admin), sign out
+│   │   │   └── AccountMenu.tsx           # Sidebar-bottom popover: profile, Settings (super-admin), theme toggle, sign out
 │   │   ├── hooks/
 │   │   │   ├── useAuth.ts
 │   │   │   └── usePermission.ts
@@ -633,7 +632,7 @@ app/(public|auth|admin)/[route]/page.tsx  ← metadata only, imports the page co
 - Client components use `useQuery`/`useMutation` from `convex/react`, wrapped in a feature hook — never called inline in page components.
 - Comments: `//` in `.ts`/`.tsx`, `{/* */}` in JSX only. No block comments. No unnecessary comments — only write one when the WHY is non-obvious.
 - Zod for all form validation, co-located with form components. Convex's `v.*` validators guard the function boundary; Zod guards the form boundary — both exist.
-- Convex functions return data or throw. No `{ data, error }` envelope — `useQuery`/`useMutation` already expose `isPending`/`error`. Surface errors with `toast.error()` from sonner.
+- Convex functions return data or throw. No `{ data, error }` envelope — `useQuery`/`useMutation` already expose `isPending`/`error`. Surface errors with `toast.error()` from sonner. Every toast call is a short title plus a `description`, never one long string — `toast.error("Sign in failed", { description: "..." })`, not `toast.error("Sign in failed: ...")`. `ThemedToaster` renders with `richColors`, so the `toast.success`/`toast.error`/`toast.warning`/`toast.info` you call is itself what sets the color — pick the type that matches, don't reach for a generic `toast()`.
 - Loading states always. `useQuery` returns `undefined` while loading — treat as loading state, use skeleton components.
 - Semantic colors only. Never raw values like `text-yellow-400` or `bg-black`.
 - Keep components under ~150 lines. Split if larger.
@@ -731,7 +730,7 @@ When in doubt, apply these in order:
 34. Anything sensitive persisted to `localStorage` goes through `localStorageHelper` (`lib/local-storage.ts`), never a raw `window.localStorage.setItem`/`getItem` call — see "Client-Side Local Storage" above. It is encryption-at-rest for casual inspection, not an auth boundary: never branch an access-control or redirect decision on a value it returns.
 35. A menu-triggered panel of content (notifications, filters, anything more than a couple of short actions) is a `Sheet`, not a `DropdownMenu` — `DropdownMenu` stays for short action lists (the account menu's Settings/Sign out). Both patterns already exist side by side in `Topbar.tsx`, don't collapse them into one.
 36. Sign-out, and any future destructive/hard-to-undo admin action (delete item, deactivate a user, etc.), goes through `components/shared/ConfirmDialog.tsx` (a controlled `AlertDialog` wrapper) instead of firing immediately from the triggering click/menu-item. When triggering it from a `DropdownMenuItem`, call `event.preventDefault()` in `onSelect` before opening it — otherwise the menu's own close behavior fights the dialog's focus handling.
-37. The light/dark toggle (`components/layout/ThemeToggle.tsx`, `next-themes`) is global — it sets `.dark` on `<html>`, so it affects the whole site, not just the admin console, even though the toggle button itself only appears in the admin `Topbar`. This is intentional (the app already ships full light/dark tokens for every surface, storefront included), not a bug — don't add a second, separately-scoped theme system for the storefront.
+37. The light/dark toggle lives in `AccountMenu` (`features/auth/components/AccountMenu.tsx`), not the header — it's a `DropdownMenuItem` with `event.preventDefault()` in `onSelect` so picking it doesn't close the menu. It's still global (`next-themes` sets `.dark` on `<html>`), affecting the whole site even though the control only appears in the admin console. This is intentional (the app already ships full light/dark tokens for every surface, storefront included), not a bug — don't add a second, separately-scoped theme system for the storefront. Switching plays a circular-reveal animation via `document.startViewTransition()` (see `theme-reveal` in `app/globals.css`) — browsers without it just swap instantly, no polyfill needed.
 
 <!-- convex-ai-start -->
 
