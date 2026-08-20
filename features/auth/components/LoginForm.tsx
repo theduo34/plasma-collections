@@ -7,10 +7,12 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { useMutation } from "convex/react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { api } from "@/convex/_generated/api"
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -21,6 +23,7 @@ type LoginValues = z.infer<typeof loginSchema>
 
 export function LoginForm() {
   const { signIn } = useAuthActions()
+  const issueSessionToken = useMutation(api.sessionTokens.issue)
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -38,7 +41,9 @@ export function LoginForm() {
     try {
       // flow is always "signIn" — there is no sign-up path in this app.
       await signIn("password", { ...values, flow: "signIn" })
-      router.push("/dashboard")
+      // A fresh admin URL every login — see convex/sessionTokens.ts.
+      const token = await issueSessionToken({})
+      router.push(`/admin/${token}/dashboard`)
     } catch {
       toast.error("Invalid email or password.")
       setIsSubmitting(false)

@@ -140,7 +140,7 @@ Three surfaces. No profiles table with a self-serve role — Convex Auth's users
 ### Registration & Role Assignment Rules
 
 - There is **no `/register` route**. There is no signup flow anywhere in the UI. Do not build it, gate it, or 404 it — it simply does not exist.
-- **admin** accounts are created by a super-admin, in-app, via `/admin/users`, calling `users.createAdmin`. The mutation re-checks the caller is super-admin before inserting.
+- **admin** accounts are created by a super-admin, in-app, via `/admin/[token]/users`, calling `users.createAdmin`. The mutation re-checks the caller is super-admin before inserting.
 - **super-admin** accounts are created by another super-admin through the same form.
 - **Bootstrapping the first super-admin** is a one-time, out-of-band step:
 
@@ -175,20 +175,24 @@ the-drop/
 │   │           └── page.tsx              # 404s unless adminToken matches env
 │   │
 │   ├── (admin)/                          # Authenticated — shared sidebar layout
-│   │   ├── layout.tsx                    # Auth guard + role check + sidebar + topbar
-│   │   ├── dashboard/
-│   │   │   └── page.tsx
-│   │   ├── catalogue/
-│   │   │   ├── page.tsx                  # Item list with edit/delete actions
-│   │   │   └── [id]/
-│   │   │       └── page.tsx              # Edit item form
-│   │   ├── catalogue/new/
-│   │   │   └── page.tsx                  # Add new item form
-│   │   └── admin/                        # super-admin only
-│   │       ├── users/
-│   │       │   └── page.tsx
-│   │       └── settings/
-│   │           └── page.tsx
+│   │   ├── layout.tsx                    # Auth guard (any admin/super-admin) + sidebar + topbar
+│   │   └── admin/
+│   │       └── [token]/                  # Per-login secret — see "Admin Session Tokens" below
+│   │           ├── layout.tsx            # Validates [token] against convex/sessionTokens.ts
+│   │           ├── dashboard/
+│   │           │   └── page.tsx
+│   │           ├── catalogue/
+│   │           │   ├── page.tsx          # Item list with edit/delete actions
+│   │           │   ├── new/
+│   │           │   │   └── page.tsx      # Add new item form
+│   │           │   └── [id]/
+│   │           │       └── page.tsx      # Edit item form
+│   │           ├── users/                # super-admin only
+│   │           │   ├── layout.tsx        # Redirects non-super-admins to the dashboard
+│   │           │   └── page.tsx
+│   │           └── settings/             # super-admin only
+│   │               ├── layout.tsx        # Redirects non-super-admins to the dashboard
+│   │               └── page.tsx
 │   │
 │   ├── api/
 │   │   └── webhooks/                     # Future: Paystack webhooks
@@ -202,6 +206,7 @@ the-drop/
 │   ├── auth.ts                           # Convex Auth config (Password provider, no signup)
 │   ├── auth.config.ts
 │   ├── users.ts                          # createAdmin, createSuperAdmin, listUsers, deactivate
+│   ├── sessionTokens.ts                  # Issues/validates/revokes the /admin/[token] URL secret
 │   ├── items.ts                          # CRUD for catalogue items
 │   ├── categories.ts                     # Category management
 │   ├── seed.ts                           # Dev-only fixture data — refuses to run on a non-empty catalogue
@@ -259,7 +264,8 @@ the-drop/
 ├── features/
 │   ├── auth/
 │   │   ├── components/
-│   │   │   └── LoginForm.tsx             # No RegisterForm — it doesn't exist
+│   │   │   ├── LoginForm.tsx             # No RegisterForm — it doesn't exist
+│   │   │   └── SignOutButton.tsx         # Revokes the session token, then Convex Auth signOut()
 │   │   ├── hooks/
 │   │   │   ├── useAuth.ts
 │   │   │   └── usePermission.ts
@@ -369,6 +375,15 @@ export default defineSchema({
     metadata: v.optional(v.any()),
     timestamp: v.number(),
   }).index("by_performer", ["performedBy"]),
+
+  // The /admin/<token>/... URL secret — see "Admin Session Tokens" below.
+  sessionTokens: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    lastActiveAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_token", ["token"]),
 })
 ```
 
@@ -517,7 +532,7 @@ export function ConvexClientProvider({ children }: { children: React.ReactNode }
 
 Next.js 16 renamed `middleware.ts` to `proxy.ts`. Do not rename it back.
 
-The login page is not at `/login`. It lives at `/<ADMIN_LOGIN_TOKEN>/login`, a path built from a UUID set in `.env.local` (see `lib/admin-login-path.ts`). Unauthenticated visitors to protected routes are redirected to `/`, never to the login path itself — a redirect to it would advertise the secret URL to anyone who tries `/dashboard`.
+The login page is not at `/login`. It lives at `/<ADMIN_LOGIN_TOKEN>/login`, a path built from a UUID set in `.env.local` (see `lib/admin-login-path.ts`). Unauthenticated visitors to protected routes are redirected to `/`, never to the login path itself — a redirect to it would advertise the secret URL to anyone who tries `/admin`.
 
 ```ts
 // proxy.ts
@@ -526,10 +541,14 @@ import {
   createRouteMatcher,
   isAuthenticatedNextjs,
   nextjsMiddlewareRedirect,
+  convexAuthNextjsToken,
 } from "@convex-dev/auth/nextjs/server"
+import { fetchQuery } from "convex/nextjs"
+import { api } from "@/convex/_generated/api"
 import { getAdminLoginPath } from "@/lib/admin-login-path"
 
-const isAdminRoute = createRouteMatcher(["/dashboard", "/admin(.*)"])
+// All admin routes live at /admin/<token>/... — see "Admin Session Tokens" below.
+const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 const isLoginRoute = createRouteMatcher([getAdminLoginPath()])
 
 export default convexAuthNextjsMiddleware(async (request) => {
@@ -537,7 +556,12 @@ export default convexAuthNextjsMiddleware(async (request) => {
     return nextjsMiddlewareRedirect(request, "/")
   }
   if (isLoginRoute(request) && (await isAuthenticatedNextjs())) {
-    return nextjsMiddlewareRedirect(request, "/dashboard")
+    const token = await fetchQuery(
+      api.sessionTokens.current,
+      {},
+      { token: await convexAuthNextjsToken() }
+    ).catch(() => null)
+    return nextjsMiddlewareRedirect(request, token ? `/admin/${token}/dashboard` : "/")
   }
 })
 
@@ -545,6 +569,24 @@ export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 }
 ```
+
+`proxy.ts` only gates "is this visitor logged in at all." The `[token]` segment itself is validated one layer deeper, in `app/(admin)/admin/[token]/layout.tsx` — see below.
+
+---
+
+## Admin Session Tokens — the `/admin/<token>/...` URL scheme
+
+Every admin/super-admin route lives under a per-login secret path segment, not a fixed one: `/admin/<token>/dashboard`, `/admin/<token>/catalogue`, etc. This is a second, independent secret on top of the Convex Auth session cookie — the same "don't put the real thing at a guessable path" idea as `/<ADMIN_LOGIN_TOKEN>/login`, applied to every page behind it instead of just the login form.
+
+Rules, enforced in `convex/sessionTokens.ts` (the real boundary — see "No Row Level Security" below) and re-checked in `app/(admin)/admin/[token]/layout.tsx` (defense in depth):
+
+- **Issued at login, never reused.** `LoginForm` calls `sessionTokens.issue` right after `signIn()` succeeds, which deletes any token the user already held and mints a new `crypto.randomUUID()`. Logging in always produces a brand-new URL — an old tab, an old bookmark, a link pasted somewhere it shouldn't have been, all stop working the moment a new login happens.
+- **One live token per user.** `issue` deletes the previous row for that `userId` before inserting — a user can't have two valid admin URLs at once.
+- **24-hour sliding idle window.** Each token row carries `lastActiveAt`. Every visit to an `/admin/[token]/...` route calls `sessionTokens.touch`, which checks `Date.now() - lastActiveAt <= 24h` and, if still valid, bumps `lastActiveAt` forward. Keep visiting at least once a day and the URL stays alive; go quiet for 24 hours and the next visit finds it expired (and deletes the row).
+- **Revoked immediately on sign-out.** `SignOutButton` calls `sessionTokens.revoke` before `signOut()` — closing the session kills the URL right away instead of waiting out the idle window.
+- **Invalid token → redirect home, same as unauthenticated.** A mismatched, expired, or someone-else's token never gets a distinguishing error — it's treated exactly like "not logged in" (redirect to `/`), so a probe can't tell a stale token from a wrong one.
+
+Don't hardcode an `/admin/...` path anywhere in the UI — every internal admin link has to include the current token, read via `useParams<{ token: string }>()` in a client component under the `[token]` segment (or `params` in a Server Component).
 
 ---
 
@@ -601,12 +643,14 @@ RESEND_API_KEY=                   # only if transactional email is added later
 | `/catalogue` | Public | Full item catalogue with category filter |
 | `/item/[id]` | Public | Item detail — images, description, price, order button |
 | `/[adminToken]/login` | Public (secret) | Email/password login — path segment must match `ADMIN_LOGIN_TOKEN`, else 404. No register link, no register route. |
-| `/dashboard` | admin, super-admin | Overview stats — total items, stock levels |
-| `/catalogue` (admin) | admin, super-admin | Manage items — add, edit, delete, toggle visibility |
-| `/catalogue/new` | admin, super-admin | Add new item form |
-| `/catalogue/[id]` | admin, super-admin | Edit item form |
-| `/admin/users` | super-admin only | Create/deactivate admin accounts, change roles |
-| `/admin/settings` | super-admin only | System config (WA number, store name, etc.) |
+| `/admin/[token]/dashboard` | admin, super-admin | Overview stats — total items, stock levels |
+| `/admin/[token]/catalogue` | admin, super-admin | Manage items — add, edit, delete, toggle visibility |
+| `/admin/[token]/catalogue/new` | admin, super-admin | Add new item form |
+| `/admin/[token]/catalogue/[id]` | admin, super-admin | Edit item form |
+| `/admin/[token]/users` | super-admin only | Create/deactivate admin accounts, change roles |
+| `/admin/[token]/settings` | super-admin only | System config (WA number, store name, etc.) |
+
+`[token]` is the per-login secret described in "Admin Session Tokens" above — not a fixed segment name.
 
 ---
 
@@ -661,6 +705,7 @@ When in doubt, apply these in order:
 28. To flip a section to the black/gold "dark luxury" palette (the homepage hero, the closing CTA+footer), add `className="dark"` to that section and keep using the normal semantic tokens (`bg-background`, `text-foreground`, `text-muted-foreground`) inside it — the `.dark` CSS scope remaps those tokens to `--pc-black`/`--pc-white`/etc. automatically. Never hardcode a dark-section color directly; if a section needs to look dark, scope it, don't recolor it.
 29. The homepage structure (Option B, approved over an "editorial split" alternative) is: full-bleed dark `HeroSection` (`-mt-16` under the nav) → `StatementSection` (one big line, no card, no icons) → `CategoryHighlights` (edge-to-edge, no gaps, no borders, name overlaid on the block) → `FeaturedSection` (borderless product tiles) → `CtaSection` + `StorefrontFooter` (share the same `dark` scope, no seam between them, deliberately one continuous closing block). Don't reintroduce bordered/boxed sections or reflow this into a symmetric "stack of equal cards" — that's the pattern this replaced.
 30. Item/category photos go through `ctx.storage` exactly the same way whether they're a real admin upload or a dev placeholder — `convex/seedImages.ts` fills in anything missing an `imageStorageId` via a placeholder image service and `ctx.storage.store()`, the real storage pipeline, not a throwaway hack. Public queries resolve `imageStorageId` to a servable URL themselves (see `PublicItem`/`PublicCategory` in `features/catalogue/types/item.ts`) — components never call `ctx.storage.getUrl` or construct a storage URL themselves. Once every item/category has a real uploaded photo, `seedPlaceholderImages` simply finds nothing left to do — no cleanup step needed.
+31. Every admin route is nested under `/admin/[token]/...` — never add an admin page at a fixed path like `/dashboard` or `/admin/settings` directly. The `[token]` is the per-login secret from `convex/sessionTokens.ts` (see "Admin Session Tokens" above); a new admin route goes under `app/(admin)/admin/[token]/`, and any link to it is built from the current token via `useParams()`/`params`, never hardcoded.
 
 <!-- convex-ai-start -->
 

@@ -3,10 +3,16 @@ import {
   createRouteMatcher,
   isAuthenticatedNextjs,
   nextjsMiddlewareRedirect,
+  convexAuthNextjsToken,
 } from "@convex-dev/auth/nextjs/server"
+import { fetchQuery } from "convex/nextjs"
+import { api } from "@/convex/_generated/api"
 import { getAdminLoginPath } from "@/lib/admin-login-path"
 
-const isAdminRoute = createRouteMatcher(["/dashboard", "/admin(.*)"])
+// All admin routes live at /admin/<token>/... — the token itself is
+// validated deeper in app/(admin)/admin/[token]/layout.tsx (see
+// convex/sessionTokens.ts). This just gates on being logged in at all.
+const isAdminRoute = createRouteMatcher(["/admin(.*)"])
 const isLoginRoute = createRouteMatcher([getAdminLoginPath()])
 
 export default convexAuthNextjsMiddleware(async (request) => {
@@ -16,7 +22,12 @@ export default convexAuthNextjsMiddleware(async (request) => {
     return nextjsMiddlewareRedirect(request, "/")
   }
   if (isLoginRoute(request) && (await isAuthenticatedNextjs())) {
-    return nextjsMiddlewareRedirect(request, "/dashboard")
+    const token = await fetchQuery(
+      api.sessionTokens.current,
+      {},
+      { token: await convexAuthNextjsToken() }
+    ).catch(() => null)
+    return nextjsMiddlewareRedirect(request, token ? `/admin/${token}/dashboard` : "/")
   }
 })
 

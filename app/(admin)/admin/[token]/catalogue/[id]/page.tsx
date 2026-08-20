@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function Page({ params }: PageProps<"/admin/catalogue/[id]">) {
+export default async function Page({ params }: PageProps<"/admin/[token]/catalogue/[id]">) {
   const { id } = await params
   return <EditItemPage itemId={id as Id<"items">} />
 }

@@ -50,4 +50,15 @@ export default defineSchema({
     metadata: v.optional(v.any()),
     timestamp: v.number(),
   }).index("by_performer", ["performedBy"]),
+
+  // The secret path segment in /admin/<token>/... — separate from the Convex
+  // Auth session itself. One row per user: issuing a new one (on login)
+  // deletes the old, and it slides a 24h idle window (see convex/sessionTokens.ts).
+  sessionTokens: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    lastActiveAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_token", ["token"]),
 })
