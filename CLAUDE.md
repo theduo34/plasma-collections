@@ -220,8 +220,8 @@ the-drop/
 │
 ├── components/
 │   ├── layout/
-│   │   ├── Sidebar.tsx                   # Persistent on lg+, opens in a Sheet on mobile (via Topbar)
-│   │   ├── Topbar.tsx                    # Mobile nav toggle + active-section label
+│   │   ├── Sidebar.tsx                   # Persistent on lg+ (collapsible to an icon rail), Sheet on mobile
+│   │   ├── Topbar.tsx                    # Mobile nav toggle, desktop collapse toggle, section label, notification bell
 │   │   ├── admin-nav-items.ts            # Nav config shared by Sidebar + Topbar (label, icon, permission)
 │   │   ├── StorefrontNav.tsx             # Public navbar with logo + WhatsApp CTA
 │   │   ├── StorefrontFooter.tsx

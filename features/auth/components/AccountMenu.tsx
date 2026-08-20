@@ -17,6 +17,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth"
 import { usePermission } from "@/features/auth/hooks/usePermission"
 import { adminSessionCache } from "@/features/auth/utils/adminSessionCache"
 import { api } from "@/convex/_generated/api"
+import { cn } from "@/lib/utils"
 
 function initialsFor(name: string) {
   return (
@@ -32,7 +33,7 @@ function initialsFor(name: string) {
 
 // The bottom-of-sidebar trigger — tapping it pops up settings/sign-out,
 // same shape as the account menu at the bottom of most admin consoles.
-export function AccountMenu() {
+export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
   const { user, isLoading } = useAuth()
   const { token } = useParams<{ token: string }>()
   const canConfigureSettings = usePermission("settings:configure")
@@ -50,23 +51,41 @@ export function AccountMenu() {
   }
 
   if (isLoading || !user) {
-    return <div className="flex h-11 items-center px-2 text-xs text-muted-foreground">Loading…</div>
+    return (
+      <div
+        className={cn(
+          "flex h-11 items-center px-2 text-xs text-muted-foreground",
+          collapsed && "justify-center px-0"
+        )}
+      >
+        {!collapsed && "Loading…"}
+      </div>
+    )
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-sidebar-accent">
+      <DropdownMenuTrigger
+        className={cn(
+          "flex w-full items-center gap-2 rounded-md p-2 text-left hover:bg-sidebar-accent",
+          collapsed && "justify-center"
+        )}
+      >
         <Avatar initials={initialsFor(user.name)} />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-sm font-medium text-sidebar-foreground">{user.name}</span>
-          <span className="truncate text-xs text-muted-foreground">
-            {user.role === "super-admin" ? "Super Admin" : "Admin"}
-          </span>
-        </div>
-        <CaretUpDownIcon size={16} className="shrink-0 text-muted-foreground" />
+        {!collapsed && (
+          <>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-medium text-sidebar-foreground">{user.name}</span>
+              <span className="truncate text-xs text-muted-foreground">
+                {user.role === "super-admin" ? "Super Admin" : "Admin"}
+              </span>
+            </div>
+            <CaretUpDownIcon size={16} className="shrink-0 text-muted-foreground" />
+          </>
+        )}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" side="top" className="w-64">
+      <DropdownMenuContent align="end" side={collapsed ? "right" : "top"} className="w-64">
         <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
           <span className="text-sm font-medium text-foreground">{user.name}</span>
           <span className="truncate text-xs font-normal text-muted-foreground">{user.email}</span>
