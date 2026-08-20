@@ -3,7 +3,8 @@ import { EditItemPage } from "@/components/pages/catalogue/EditItemPage"
 import type { Id } from "@/convex/_generated/dataModel"
 
 export const metadata: Metadata = {
-  title: "Edit Item — Plasma Collections Admin",
+  title: "Edit Item",
+  robots: { index: false, follow: false },
 }
 
 export default async function Page({ params }: PageProps<"/admin/catalogue/[id]">) {

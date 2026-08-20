@@ -5,6 +5,7 @@ import { StatementSection } from "@/components/pages/storefront/StatementSection
 import { CategoryHighlights } from "@/components/pages/storefront/CategoryHighlights"
 import { FeaturedSection } from "@/components/pages/storefront/FeaturedSection"
 import { CtaSection } from "@/components/pages/storefront/CtaSection"
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site"
 
 function buildChatHref(phoneNumber: string | undefined) {
   if (!phoneNumber) return undefined
@@ -18,6 +19,19 @@ export async function StorefrontHomePage() {
 
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ClothingStore",
+            name: SITE_NAME,
+            description: SITE_DESCRIPTION,
+            url: SITE_URL,
+            image: `${SITE_URL}/opengraph-image.png`,
+          }),
+        }}
+      />
       <HeroSection />
       <StatementSection />
       <CategoryHighlights categories={categories} />

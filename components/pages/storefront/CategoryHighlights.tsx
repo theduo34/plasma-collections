@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
@@ -22,15 +22,24 @@ function shuffle<T>(array: T[]): T[] {
 //
 // Which categories show (and their order) is randomized once per page load
 // — 3 on mobile, up to 4 at lg — so different visitors, and every refresh,
-// see a different mix.
+// see a different mix. The shuffle only happens client-side, after mount:
+// doing it in a useState initializer would run once during SSR and again
+// during client hydration, and since Math.random() differs each time, the
+// two renders would produce a different order and React would throw a
+// hydration mismatch. Starting from the unshuffled list keeps the first
+// paint identical on server and client, then the effect reorders it.
 export function CategoryHighlights({ categories }: { categories: PublicCategory[] }) {
-  const [shuffled] = useState(() => shuffle(categories).slice(0, 4))
+  const [shown, setShown] = useState(() => categories.slice(0, 4))
 
-  if (shuffled.length === 0) return null
+  useEffect(() => {
+    queueMicrotask(() => setShown(shuffle(categories).slice(0, 4)))
+  }, [categories])
+
+  if (shown.length === 0) return null
 
   return (
     <section className="flex min-h-[28rem]">
-      {shuffled.map((category, index) => (
+      {shown.map((category, index) => (
         <Link
           key={category._id}
           href={`/catalogue?category=${category.slug}`}

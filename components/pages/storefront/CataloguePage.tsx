@@ -4,9 +4,14 @@ import { CatalogueBrowser } from "@/features/catalogue/components/CatalogueBrows
 
 export function CataloguePage() {
   return (
-    <Suspense fallback={<CatalogueSkeleton />}>
-      <CatalogueBrowser />
-    </Suspense>
+    <>
+      {/* No visible page title by design (search bar replaces it) — kept
+          for SEO/accessibility so the page still has exactly one h1. */}
+      <h1 className="sr-only">Catalogue</h1>
+      <Suspense fallback={<CatalogueSkeleton />}>
+        <CatalogueBrowser />
+      </Suspense>
+    </>
   )
 }
 

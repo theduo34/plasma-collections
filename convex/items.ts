@@ -60,7 +60,7 @@ export const list = query({
   args: {},
   handler: async (ctx) => {
     await requireRole(ctx, ["admin", "super-admin"])
-    throw new Error("Not implemented")
+    return await ctx.db.query("items").collect()
   },
 })
 
