@@ -47,7 +47,7 @@ export function LoginForm() {
       await adminSessionCache.save(token)
       router.push(`/admin/${token}/dashboard`)
     } catch {
-      toast.error("Invalid email or password.")
+      toast.error("Sign in failed", { description: "Check your email and password and try again." })
       setIsSubmitting(false)
     }
   }
