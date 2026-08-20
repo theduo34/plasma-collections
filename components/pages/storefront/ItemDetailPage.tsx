@@ -89,7 +89,7 @@ export function ItemDetailPage({ itemId }: { itemId: Id<"items"> }) {
                   type="button"
                   onClick={() => {
                     addItem({ itemId: item._id, name: item.name, price: item.price, quantity })
-                    toast.success(`Added ${item.name} to cart`)
+                    toast.success("Added to cart", { description: item.name })
                   }}
                   className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-base font-medium text-primary-foreground transition-opacity hover:opacity-90"
                 >
