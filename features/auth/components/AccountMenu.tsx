@@ -1,10 +1,11 @@
 'use client'
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useMutation } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
-import { CaretUpDownIcon, GearSixIcon, SignOutIcon } from "@phosphor-icons/react"
+import { useTheme } from "next-themes"
+import { CaretUpDownIcon, GearSixIcon, MoonIcon, SignOutIcon, SunIcon } from "@phosphor-icons/react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,25 @@ import { usePermission } from "@/features/auth/hooks/usePermission"
 import { adminSessionCache } from "@/features/auth/utils/adminSessionCache"
 import { api } from "@/convex/_generated/api"
 import { cn } from "@/lib/utils"
+
+const subscribeNever = () => () => {}
+
+// Animates the light/dark swap as a circle expanding from the toggle row
+// itself, via the View Transitions API (see the theme-reveal keyframes
+// in app/globals.css). Origin is the element's own center rather than a
+// raw click point so it works the same for a mouse click or a keyboard
+// Enter. Browsers without View Transitions just swap instantly.
+function toggleThemeWithTransition(origin: Element, next: string, setTheme: (theme: string) => void) {
+  const rect = origin.getBoundingClientRect()
+  document.documentElement.style.setProperty("--theme-toggle-x", `${rect.left + rect.width / 2}px`)
+  document.documentElement.style.setProperty("--theme-toggle-y", `${rect.top + rect.height / 2}px`)
+
+  if (typeof document.startViewTransition !== "function") {
+    setTheme(next)
+    return
+  }
+  document.startViewTransition(() => setTheme(next))
+}
 
 function initialsFor(name: string) {
   return (
@@ -43,6 +63,11 @@ export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
   const revokeSessionToken = useMutation(api.sessionTokens.revoke)
   const router = useRouter()
   const [confirmSignOutOpen, setConfirmSignOutOpen] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+  // Theme is unknown until after hydration — the mounted check avoids a
+  // server/client mismatch on the icon shown.
+  const themeMounted = useSyncExternalStore(subscribeNever, () => true, () => false)
+  const isDark = themeMounted && resolvedTheme === "dark"
 
   async function handleSignOut() {
     // Revoke first — the /admin/<token> URL dies immediately instead of
@@ -89,7 +114,7 @@ export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
           )}
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" side={collapsed ? "right" : "top"} className="w-72">
+        <DropdownMenuContent align="end" side={collapsed ? "right" : "top"} className="w-80">
           <DropdownMenuLabel className="flex flex-col gap-1 px-3 py-3">
             <span className="text-base font-semibold text-foreground">{user.name}</span>
             <span className="truncate text-sm font-normal text-muted-foreground">{user.email}</span>
@@ -103,6 +128,17 @@ export function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
               </Link>
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem
+            disabled={!themeMounted}
+            className="gap-3 px-3 py-3 text-sm"
+            onSelect={(event) => {
+              event.preventDefault()
+              toggleThemeWithTransition(event.currentTarget as Element, isDark ? "light" : "dark", setTheme)
+            }}
+          >
+            {isDark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+            {isDark ? "Switch to light mode" : "Switch to dark mode"}
+          </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
             className="gap-3 px-3 py-3 text-sm"
